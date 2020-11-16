@@ -1,6 +1,7 @@
 ## pedejas izmaiņas:
 ## 1. izņēmu csv rakstīšanu ārā
 ## 2. pamainīšu datubāzi un šo jāpalaiž kā papildu jaunu event paralēli vecajam... ja nu kaut kas nobrūk
+
 import sys
 import requests
 import time
@@ -43,9 +44,11 @@ lpp_skaits = round(int(skaits_n) / 30) + 4
 ## shai funkcijai divi papildinajumi:
 ## 1. papildinajums ir mainigais vai sell/handover - maina tikai adresi
 ## 2. papildinajums ir mainigais par ni tipu - mainas adrese, kolonnas atzimejama informacija
-def ss_scraping(lpp):
-    url = "https://www.ss.com/lv/real-estate/flats/today-2/sell/page"+ str(lpp)+".html"
+def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
+    url = "https://www.ss.com/lv/real-estate/" + saraksts_veids(ipasuma_veids) + "/today-2/" + saraksts_darij(darijuma_veids) + "/page"+ str(lpp)+".html"
     
+##!! šeit vajag īpašo error handling , ja vispār nav neviena šāda sludinājuma
+        
     ## Tālāk seko errorchecking sadaļa pārbaudot ss.com darbību
     ## --C1-- Nepieciešams uzlabot pievienojot error logging
     while True:
@@ -71,25 +74,36 @@ def ss_scraping(lpp):
    # Taalaak tiek iterets cauri visaam rindaam
 
     for tr in table_rows:
-
-        id_string = tr.contents[0].contents[0]
-        id_text=str(id_string)[10:20]
-
-        location_detailed = tr.contents[3].contents
-
-
-        data = tr.find_all("td")
-
         
+        ##!! kas notiks kad pieprasisim vairak kolonnas nekaa ir?
+        
+        data = tr.find_all("td")
+        id_string = tr.contents[0].contents[0] ## vai var uzlavot ar data.get_text?
+        id_text=str(id_string)[10:20]
         ad_text = data[2].get_text()
-        majas_stavs = data[4].get_text()
-        platiba_m2 = data[5].get_text()
-        house_type = data[6].get_text()
-        cena = data[7].get_text()
+        location_detailed = tr.contents[3].contents ## vai var uzlavot ar data.get_text?
+        if ipasuma_veids == 0:
+                ##flats
+                platiba_m2 = data[5].get_text()
+                majas_stavs = data[4].get_text()
+                house_type = data[6].get_text()
+                cena = data[7].get_text()
+                ##taalaak vajadzees elifus
+        else:
+                ##house
+                platiba_m2 = data[4].get_text()
+                majas_stavs = data[5].get_text()
+                house_type = "na"
+                room_count = data[6].get_text()
+                land_m2 = data[7].get_text()
+                cena = data[8].get_text()
+   
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
         
         ## print debugging sadaļa
         print("..")
+        print("flat = 0, maja = 1")
+        print(ipasuma_veids)
         print(location_detailed)
         print(lpp)
         print(timestamp) 
@@ -123,4 +137,4 @@ while True:
 
 
 
-
+## tālākai nākotnei - izdarīto darbību skaitu vajag kautkur uzskaitīt un monitorēt onlainā, lai pamanām ja kas apstājies
