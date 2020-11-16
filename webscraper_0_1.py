@@ -1,19 +1,14 @@
-
+## pedejas izmaiņas:
+## 1. izņēmu csv rakstīšanu ārā
+## 2. pamainīšu datubāzi un šo jāpalaiž kā papildu jaunu event paralēli vecajam... ja nu kaut kas nobrūk
 import sys
 import requests
 import time
 from bs4 import BeautifulSoup
-import csv
-
-## pamatlinks, uz kura baazes viss tiek taisits.
-## ar divu dienu sludinajumiem netiks palaists garam
-## bet dublikatus pec tam no datubazes izfiltres
-
 import sqlite3
-conn = sqlite3.connect('result4.db')
+
+conn = sqlite3.connect('result02.db') ## jaapapildina datubaze ar vienu kolonnu; nosaukt jaunu datubazes failu
 c = conn.cursor()
-
-
 url = "https://www.ss.com/lv/real-estate/flats/today-2/sell/"
 
 while True:
@@ -92,9 +87,6 @@ def ss_scraping(lpp):
         print(lpp)
         print(timestamp) 
         csv_entry = (id_text, str(location_detailed), str(ad_text), majas_stavs, platiba_m2, house_type, cena, timestamp) 
-        with open('database.csv', 'a+', encoding = 'UTF-8', newline = '') as fd:
-            csv.writer(fd).writerow(csv_entry)
-            fd.close
         c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)", csv_entry)
         conn.commit()
         
