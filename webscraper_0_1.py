@@ -1,51 +1,38 @@
-## pedejas izmaiņas:
-## 1. izņēmu csv rakstīšanu ārā
-## 2. pamainīšu datubāzi un šo jāpalaiž kā papildu jaunu event paralēli vecajam... ja nu kaut kas nobrūk
-
-import sys
 import requests
 import time
 from bs4 import BeautifulSoup
-import sqlite3
 
 ts = time.gmtime()
-
-## Datubāzei vairāki papildinājumi: pielikt kolonnu "saite", kolonnu "darijums - ar opciju pardod/izire", kolonnu "avots", kur bus ss.com, kolonnu "nek.veids" 
-## ar attieciguiem mainigajiem dzivoklis, maja, zeme, vasarnica, telpas, biroji
-## un tad vēl jaunas kolonnas zemes pl. (kur ir m2 vai ha vai na) 
-conn = sqlite3.connect('result02.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
-c = conn.cursor()
-
-## Tagad jāizveido divi saraksta mainigie - sell/hand-over; telpu saraksts
-## Katram ir savs kolonnu skaits un informacija 
 
 saraksts_darij = ["sell", "hand_over"]
 saraksts_veids = ["flats", "homes-summer-residences", "farms-estates", "premises", "offices"]
         
-## šeit seko lapu izskaitīšana 
-## vai to vajag katram veidam? Laikam, ja gribu vienu kodu visām darbībām
 
-url = "https://www.ss.com/lv/real-estate/flats/today-2/sell/"
+url = "https://www.ss.com/lv/real-estate/farms-estates/today/hand_over/"
 r = requests.get(url)
 soup = BeautifulSoup(r.content, 'html.parser')
-
+print("1")
 ## tiek atlasitas visas tabulas
 tables = soup.findAll('table')
+print("2")
+print(len(tables))
 
 #tiek ieguts sludinajumu skaits
 slud_skaits = tables[1].find_all("option")[2].get_text()
 skaits_n = slud_skaits.split()[-1]
+print("3")
 
 #lpp skaits ir ar uzviju, un tad ir dublikati
 lpp_skaits = round(int(skaits_n) / 30) + 4
-
+print("4")
 
 ## tad jaabuut funkcijai kas iteree cauri visaam lapaam
 ## shai funkcijai divi papildinajumi:
 ## 1. papildinajums ir mainigais vai sell/handover - maina tikai adresi
 ## 2. papildinajums ir mainigais par ni tipu - mainas adrese, kolonnas atzimejama informacija
 def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
-    url = "https://www.ss.com/lv/real-estate/" + str(saraksts_veids[ipasuma_veids]) + "/today-2/" + str(saraksts_darij[darijuma_veids]) + "/page"+ str(lpp)+".html"
+    url = "https://www.ss.com/lv/real-estate/" + str(saraksts_veids[ipasuma_veids]) + "/today/" + str(saraksts_darij[darijuma_veids]) + "/page"+ str(lpp)+".htmll"
+    print(url)
     
 ##!! šeit vajag īpašo error handling , ja vispār nav neviena šāda sludinājuma
         
@@ -65,7 +52,7 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
 
     # interesanta parasti ir piekta tabula
     tablex = tables[4]
-    
+
     # tiek atlasitas visas rindas tajaa tabulaa
     table_rowsx = tablex.find_all('tr')
    # un tad tiek lietotas visas rindas iznjemot pirmo (header)
@@ -80,23 +67,17 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         data = tr.find_all("td")
         id_string = tr.contents[0].contents[0] ## vai var uzlavot ar data.get_text?
         id_text=str(id_string)[10:20]
-        linky = data[1].find('a')['href']
         ad_text = data[2].get_text()
+        linky = data[1].find('a')['href']
         location_detailed = tr.contents[3].contents ## vai var uzlavot ar data.get_text?
-        
-
-        #galvenā datu sagrupēšanas sadaļa no veidiem
-        
         if ipasuma_veids == 0:
                 ##flats
                 platiba_m2 = data[5].get_text()
                 majas_stavs = data[4].get_text()
                 house_type = data[6].get_text()
                 cena = data[7].get_text()
-                land_m2 = "na"
-                room_count = "na"
                 ##taalaak vajadzees elifus
-        elif ipasuma_veids == 1:
+        else:
                 ##house
                 platiba_m2 = data[4].get_text()
                 majas_stavs = data[5].get_text()
@@ -104,24 +85,18 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
                 room_count = data[6].get_text()
                 land_m2 = data[7].get_text()
                 cena = data[8].get_text()
-        else:
-                ##viensetas
-                
    
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
-        
+        print(linky)
         ## print debugging sadaļa
         print("..")
         print("flat = 0, maja = 1")
         print(ipasuma_veids)
+        print("..")
         print(location_detailed)
         print(lpp)
         print(timestamp) 
         
-        ## uzreiz iekš entry var ielikt str(saraksts_veids[darijuma_veids])
-        sql_entry = (id_text, str(location_detailed), str(ad_text), majas_stavs, platiba_m2, house_type, cena, timestamp) 
-        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
-        conn.commit()
         
 
 
@@ -131,25 +106,28 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
 while True:
     while True:
         try:
-            for ipasuma_veids in range(3):
+            for ipasuma_veids in range(1,3):
                 for darijuma_veids in range(2):
                     for lpp in range(lpp_skaits):
                         
-                        ##šeit laikam ielikt error handling
+                                                ##šeit laikam ielikt error handling
                         url = "https://www.ss.com/lv/real-estate/" + str(saraksts_veids[ipasuma_veids]) + "/today-2/" + str(saraksts_darij[darijuma_veids]) + "/page"+ str(lpp)+".html"
+                        ##papildus error handling šeit laikam vajag vai requests nostrādā, vai ko darit ja lapa ir down
+                        r = requests.get(url)
                         soup = BeautifulSoup(r.content, 'html.parser')
                         tables = soup.findAll('table')
                         tablex = tables[4]
-                                         
+                        print(url)
+                        print("ecc")                 
                         if "sludinājumi nav atrasti" in tablex.get_text():
+                                print("check")
                                 ## vajadzētu ielogot šo gadījumu
-                                continue
-                                
+                                break
                         
                         ss_scraping(lpp, ipasuma_veids, darijuma_veids)
                         time.sleep(1)
             time.sleep(100)
-            sys.exit()
+            break
         except Exception as e:
             f = open('log.txt', 'w')
             f.write('An exceptional thing happed - %s' % e)
@@ -158,6 +136,3 @@ while True:
             pass
     
 
-
-
-## tālākai nākotnei - izdarīto darbību skaitu vajag kautkur uzskaitīt un monitorēt onlainā, lai pamanām ja kas apstājies
