@@ -138,8 +138,13 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         
         ## uzreiz iekš entry var ielikt str(saraksts_veids[darijuma_veids])
         ## vel var ielikt uzreiz avotu ss.com
-        sql_entry = (id_text, str(location_detailed), str(ad_text), majas_stavs, platiba_m2, house_type, cena, timestamp) 
-        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+        avots = 'ss.com'
+        estate_type = saraksts_veids[ipasuma_veids]
+        transaction_type = saraksts_darij[darijuma_veids]
+        sql_entry = (id_text, str(ad_text), majas_stavs, str(location_detailed), platiba_m2, land_m2, house_type, cena, linky, avots, estate_type, transaction_type, timestamp) 
+        ## db file structure: name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp
+        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+        
         conn.commit()
         
 
