@@ -15,15 +15,11 @@ ts = time.gmtime()
 ## un tad vēl jaunas kolonnas zemes pl. (kur ir m2 vai ha vai na) 
 conn = sqlite3.connect('result02.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
-
-## Tagad jāizveido divi saraksta mainigie - sell/hand-over; telpu saraksts
-## Katram ir savs kolonnu skaits un informacija 
-
 saraksts_darij = ["sell", "hand_over"]
-saraksts_veids = ["flats", "homes-summer-residences", "farms-estates", "premises", "offices"]
+saraksts_veids = ["flats", "homes-summer-residences", "farms-estates", "offices", "plots-and-lands"]
         
 ## šeit seko lapu izskaitīšana 
-## vai to vajag katram veidam? Laikam, ja gribu vienu kodu visām darbībām
+## vai to vajag katram veidam? Varētu to izdarīt lai mazāk dublikātu
 
 url = "https://www.ss.com/lv/real-estate/flats/today-2/sell/"
 r = requests.get(url)
@@ -104,8 +100,30 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
                 room_count = data[6].get_text()
                 land_m2 = data[7].get_text()
                 cena = data[8].get_text()
-        else:
+        elif ipasuma_veids == 2:
                 ##viensetas
+                platiba_m2 = data[5].get_text()
+                majas_stavs = data[4].get_text()
+                house_type = "na"
+                room_count = "na"
+                land_m2 = data[6].get_text()
+                cena = data[7].get_text()
+        elif ipasuma_veids == 3:
+                ##biroji
+                platiba_m2 = data[4].get_text()
+                majas_stavs = data[5].get_text()
+                house_type = "na"
+                room_count = "na"
+                land_m2 = "na"
+                cena = data[6].get_text()
+        else:
+                ##zeme
+                platiba_m2 = data[4].get_text()
+                majas_stavs = "na"
+                house_type = "na"
+                room_count = "na"
+                land_m2 = "na"
+                cena = data[5].get_text()
                 
    
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
@@ -119,6 +137,7 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         print(timestamp) 
         
         ## uzreiz iekš entry var ielikt str(saraksts_veids[darijuma_veids])
+        ## vel var ielikt uzreiz avotu ss.com
         sql_entry = (id_text, str(location_detailed), str(ad_text), majas_stavs, platiba_m2, house_type, cena, timestamp) 
         c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         conn.commit()
@@ -131,31 +150,33 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
 while True:
     while True:
         try:
-            for ipasuma_veids in range(3):
+            for ipasuma_veids in range(5):
                 for darijuma_veids in range(2):
                     for lpp in range(lpp_skaits):
                         
-                        ##šeit laikam ielikt error handling
-                        url = "https://www.ss.com/lv/real-estate/" + str(saraksts_veids[ipasuma_veids]) + "/today-2/" + str(saraksts_darij[darijuma_veids]) + "/page"+ str(lpp)+".html"
-                        soup = BeautifulSoup(r.content, 'html.parser')
-                        tables = soup.findAll('table')
-                        tablex = tables[4]
-                                         
-                        if "sludinājumi nav atrasti" in tablex.get_text():
-                                ## vajadzētu ielogot šo gadījumu
-                                continue
-                                
-                        
-                        ss_scraping(lpp, ipasuma_veids, darijuma_veids)
+                        try:
+                            ss_scraping(lpp, ipasuma_veids,darijuma_veids)
+                        except IndexError:
+                            f = open('log.txt', 'a')
+                            timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
+                            ## Šeit jāsaformatē error logging
+                            liste = (saraksts_darij[darijuma_veids], saraksts_veids[ipasuma_veids], lpp)
+                            f.write('\n %s \n' % str(timestamp))
+                            f.write('\nIndex error: '.join(str(item) for item in liste))
+                            f.close()
+                            pass
+                        continue
+
                         time.sleep(1)
             time.sleep(100)
             sys.exit()
         except Exception as e:
-            f = open('log.txt', 'w')
+            f = open('log.txt', 'a')
             f.write('An exceptional thing happed - %s' % e)
             f.close()
             time.sleep(10)
             pass
+        continue
     
 
 
