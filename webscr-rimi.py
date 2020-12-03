@@ -37,3 +37,73 @@ for links in linku_saraksts:
   try:
     #access link to see if site is not down, if site down, except e thingy logs it and somehow should pass time and try again
     sadalas_saglabasana(links)
+
+    
+    
+
+
+from selenium import webdriver
+import time
+from bs4 import BeautifulSoup
+
+driver = webdriver.Firefox()
+
+driver.get('https://www.rimi.lv/e-veikals/lv/produkti/piena-produkti-un-olas/c/SH-11?page=13&pageSize=80&query=')
+
+time.sleep(4)
+page_source = driver.page_source
+soup = BeautifulSoup(page_source, 'html.parser')
+
+g_data = soup.find("div", {"class": "pagination"})
+
+h_data = g_data.find_all("li", {"class": "pagination__item"})
+
+lapu_skaits = h_data[-2].text
+
+p_data = soup.find("ul", {"class": "product-grid"})
+item_data = p_data.find_all("li", {"class": "product-grid__item"})
+print(len(item_data))
+
+for item in item_data[0:12]:
+    print(type(item))
+    print("...")
+    print(item.find("div")['data-product-code'])
+    print(item.find("div")['data-gtms-click-name'])
+    print(item.find("a")['href'])
+    print(item.find("p", {"class": "card__name"}).text)
+    print(item.find("div")['data-gtm-eec-product'])
+    cena_tag = item.find("div", {"class": "card__price"})
+    #print(len(cena_tag))
+    cenas_komp=[]
+    if type(cena_tag) == type(item.find("p", {"class": "tests nav miris"})):
+        print("vajag sheit visus mainigos pa nullem un else funkciju talak visiem parejiem")
+        
+
+    for x in cena_tag:
+        cenas_komp.extend(x)
+    #cena_v_eur = cena_tag[1].text
+    #print(cena_v_eur)
+    #cena_cent = cena_tag[3].text
+    #print(cena_cent)
+    print(cenas_komp)
+    cena_full = str(cenas_komp[1]) + str(cenas_komp[4].text)
+    print(cena_full)
+    print(type(item.find("p", {"class": "card__old-price"})))
+
+
+    print(item.find("p", {"class": "card__price-per"}).text)
+    if type(item.find("p", {"class": "card__old-price"})) != type(item.find("p", {"class": "tests nav miris"})):
+        print("vecaa cena")
+        print(item.find("p", {"class": "card__old-price"}).text)
+    else:
+        discount="no"
+
+
+
+
+
+
+ #       ad_link = h_data[count].find("a")['href']
+  #      print(ad_link)
+#        img_link = h_data[count].find("img")['src']
+  
