@@ -81,5 +81,6 @@ while link != 2:
         f.write('\n %s \n' % str(timestamp))
         f.write('\n error atverot linku nr.: '.join(str(link)))
         f.close()
+        time.sleep(10)
         pass
 sys.exit()
