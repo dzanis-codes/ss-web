@@ -163,7 +163,7 @@ while True:
                         try:
                             ss_scraping(lpp, ipasuma_veids,darijuma_veids)
                         except IndexError:
-                            f = open('log_ss.txt', 'a')
+                            f = open('log_ss.txt', 'a+')
                             ts = time.gmtime()
                             timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
                             ## Šeit jāsaformatē error logging
@@ -178,7 +178,7 @@ while True:
             time.sleep(100)
             sys.exit()
         except Exception as e:
-            f = open('log_ss.txt', 'a')
+            f = open('log_ss.txt', 'a+')
             f.write('An exceptional thing happed - %s' % e)
             ts = time.gmtime()
             timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
