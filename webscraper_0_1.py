@@ -8,7 +8,7 @@ import time
 from bs4 import BeautifulSoup
 import sqlite3
 
-ts = time.gmtime()
+
 
 ## Datubāzei vairāki papildinājumi: pielikt kolonnu "saite", kolonnu "darijums - ar opciju pardod/izire", kolonnu "avots", kur bus ss.com, kolonnu "nek.veids" 
 ## ar attieciguiem mainigajiem dzivoklis, maja, zeme, vasarnica, telpas, biroji
@@ -126,6 +126,7 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
                 cena = data[5].get_text()
                 
    
+        ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
         
         ## print debugging sadaļa
@@ -162,7 +163,8 @@ while True:
                         try:
                             ss_scraping(lpp, ipasuma_veids,darijuma_veids)
                         except IndexError:
-                            f = open('log.txt', 'a')
+                            f = open('log_ss.txt', 'a')
+                            ts = time.gmtime()
                             timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
                             ## Šeit jāsaformatē error logging
                             liste = (saraksts_darij[darijuma_veids], saraksts_veids[ipasuma_veids], lpp)
@@ -176,8 +178,11 @@ while True:
             time.sleep(100)
             sys.exit()
         except Exception as e:
-            f = open('log.txt', 'a')
+            f = open('log_ss.txt', 'a')
             f.write('An exceptional thing happed - %s' % e)
+            ts = time.gmtime()
+            timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
+            f.write('time: %s' % timestamp
             f.close()
             time.sleep(10)
             pass
