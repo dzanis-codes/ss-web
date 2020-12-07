@@ -5,13 +5,12 @@
 ## 4. sadalīt plot tekstu pareizi
 ## 5. var mēģināt vērt katru sludinajumu no pilnā sitemap vaļā un saglabāt arī vairāk info
 
-from selenium import webdriver
 import time
 from bs4 import BeautifulSoup
 import sys
 import sqlite3
+import requests
 
-driver = webdriver.Firefox()
 conn = sqlite3.connect('result01c24.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
@@ -19,10 +18,10 @@ link_list = ('https://www.city24.lv/en/list/sale/rent/houses?str=2&lang=en&c=LV&
 
 
 def glabat_slud(link, type):
-    driver.get(link)
+    r = requests.get(link)
     time.sleep(4)
-    page_source = driver.page_source
-    soup = BeautifulSoup(page_source, 'html.parser')
+
+    soup = BeautifulSoup(r.content, 'html.parser')
 
     #g_data = soup.find_all("div", {"class": "results resultList"})
 
@@ -69,7 +68,8 @@ def glabat_slud(link, type):
 link = 0
 while link != 2:
     try:
-        driver.get(link_list[link])
+        r = requests.get(link_list[link])
+        soup = BeautifulSoup(r.content, 'html.parser')
         time.sleep(4)
         glabat_slud(link_list[link], link)
         link += 1
