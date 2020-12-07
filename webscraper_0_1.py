@@ -161,30 +161,22 @@ while ipasuma_veids < 5:
                         
                         try:
                             ss_scraping(lpp, ipasuma_veids,darijuma_veids)
-                        except IndexError:
+                        except Exception as e:
                             f = open('log_ss.txt', 'a+')
                             ts = time.gmtime()
                             timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
                             ## Šeit jāsaformatē error logging
                             liste = (saraksts_darij[darijuma_veids], saraksts_veids[ipasuma_veids], lpp)
                             f.write('\n %s \n' % str(timestamp))
-                            f.write('\nIndex error: '.join(str(item) for item in liste))
+                            f.write('\n error:%s \n' % e)
+                            f.write('\n darijuma veids, ipasuma veids,lpp: '.join(str(item) for item in liste))
                             f.close()
                             pass
                         continue
 
                         time.sleep(1)
         ipasuma_veids += 1
-        except Exception as e:
-            f = open('log_ss.txt', 'a+')
-            f.write('An exceptional thing happed - %s' % e)
-            ts = time.gmtime()
-            timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
-            f.write('time: %s' % timestamp
-            f.close()
-            time.sleep(10)
-            pass
-        continue
+
 sys.exit()
     
 
