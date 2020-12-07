@@ -153,10 +153,9 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
 #main function review
 #Veelaak apdomat vai vajadzigi divi while true 
 
-while True:
-    while True:
+ipasuma_veids = 0
+while ipasuma_veids < 5:
         try:
-            for ipasuma_veids in range(5):
                 for darijuma_veids in range(2):
                     for lpp in range(lpp_skaits):
                         
@@ -175,8 +174,7 @@ while True:
                         continue
 
                         time.sleep(1)
-            time.sleep(100)
-            sys.exit()
+        ipasuma_veids += 1
         except Exception as e:
             f = open('log_ss.txt', 'a+')
             f.write('An exceptional thing happed - %s' % e)
@@ -187,6 +185,7 @@ while True:
             time.sleep(10)
             pass
         continue
+sys.exit()
     
 
 
