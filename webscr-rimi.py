@@ -12,7 +12,7 @@ conn = sqlite3.connect('result01rimi.db') ## jaapapildina datubaze ar kolonnām;
 c = conn.cursor()
 
 def savaksana(links):
-    r = requests.get(links)
+    r = requests.get(links, verify = False)
     time.sleep(4)
     soup = BeautifulSoup(r.content, 'html.parser')
 
@@ -82,7 +82,7 @@ linku_saraksts = ('https://www.rimi.lv/e-veikals/lv/produkti/augli-un-darzeni/c/
 linka_nr = 0
 while linka_nr < len(linku_saraksts):
     try:
-        r = requests.get(linku_saraksts[linka_nr])
+        r = requests.get(linku_saraksts[linka_nr], verify = False)
         time.sleep(5)
         soup = BeautifulSoup(r.content, 'html.parser')
 
@@ -98,7 +98,7 @@ while linka_nr < len(linku_saraksts):
             savaksana(new_url)
 
         linka_nr += 1
-    except IndexError as e:
+    except Exception as e:
         f = open('log_rimi.txt', 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
