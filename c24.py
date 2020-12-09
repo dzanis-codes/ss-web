@@ -5,13 +5,12 @@
 ## 4. sadalīt plot tekstu pareizi
 ## 5. var mēģināt vērt katru sludinajumu no pilnā sitemap vaļā un saglabāt arī vairāk info
 
-from selenium import webdriver
 import time
 from bs4 import BeautifulSoup
 import sys
 import sqlite3
+import requests
 
-driver = webdriver.Firefox()
 conn = sqlite3.connect('result01c24.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
@@ -19,10 +18,10 @@ link_list = ('https://www.city24.lv/en/list/sale/rent/houses?str=2&lang=en&c=LV&
 
 
 def glabat_slud(link, type):
-    driver.get(link)
+    r = requests.get(link)
     time.sleep(4)
-    page_source = driver.page_source
-    soup = BeautifulSoup(page_source, 'html.parser')
+
+    soup = BeautifulSoup(r.content, 'html.parser')
 
     #g_data = soup.find_all("div", {"class": "results resultList"})
 
@@ -60,25 +59,27 @@ def glabat_slud(link, type):
         ts = time.gmtime()
         stamp = time.strftime("%Y-%m-%d %H:%M:%S", ts)
         print(" adrese: "+ adrese + " ad id: "+ad_id + "cena:  "+cena+ "platiba, istabas un stavi" + platiba + istabas+ stavi, stamp)
-        sql_entry = (str(ad_id), str(apraksts), str(stavi), str(adrese), str(platiba), str(cena), str(cena_m2), str(ad_link), "c24", estate_type, str(istabas), stamp) 
+        sql_entry = (str(ad_id), str(apraksts), str(stavi), str(adrese), str(platiba), "land?", str(cena), str(cena_m2), str(ad_link), "c24", estate_type, str(istabas), stamp) 
         ## db file structure: INTEGER PRIMARY KEY, ad_id, apraksts, stavs, adrese, premise_m2, land_m2, cena, cena_m2, ad_link, ad_source, estate_type, istabas, timestamp
-        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         
         conn.commit()
 
 link = 0
 while link != 2:
     try:
-        driver.get(link_list[link])
+        r = requests.get(link_list[link])
+        soup = BeautifulSoup(r.content, 'html.parser')
         time.sleep(4)
         glabat_slud(link_list[link], link)
         link += 1
-    except: Exception
-        f = open('log.txt', 'a')
+    except Exception as e:
+        f = open('log.txt', 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
-        liste = (saraksts_darij[darijuma_veids], saraksts_veids[ipasuma_veids], lpp)
+        liste = ("linka nr:", link)
         f.write('\n %s \n' % str(timestamp))
+        f.write('\n %s \n' % e)
         f.write('\n error atverot linku nr.: '.join(str(link)))
         f.close()
         time.sleep(10)
