@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 import sys
 import sqlite3
 import requests
+import traceback
 
 conn = sqlite3.connect('result01c24.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
@@ -82,6 +83,8 @@ while link != 2:
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
         f.write('\n %s \n' % str(timestamp))
         f.write('\n %s \n' % e)
+        tb = traceback.TracebackException.from_exception(e)
+        f.write('\n'.join(tb.stack.format()))        
         f.write('\n error atverot linku nr.: '.join(str(link)))
         f.close()
         time.sleep(10)
