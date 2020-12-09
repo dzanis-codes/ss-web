@@ -1,3 +1,5 @@
+## !!pagaidām vajag laist 2x dienā
+
 ## uzlabojumi - 
 ## 1. linkus varētu ņemt no sitemap, bet tad vajadzīgs spiest uz pogām par jaunākajiem
 ## 2. ja uzspiestu uz otrās dzīvokļu lapas, tad varētu ņemt retāk
@@ -64,6 +66,7 @@ def glabat_slud(link, type):
         c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         
         conn.commit()
+        print(sql_entry)
 
 link = 0
 while link != 2:
@@ -74,10 +77,9 @@ while link != 2:
         glabat_slud(link_list[link], link)
         link += 1
     except Exception as e:
-        f = open('log.txt', 'a+')
+        f = open('errorlog_c24.txt', 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
-        liste = ("linka nr:", link)
         f.write('\n %s \n' % str(timestamp))
         f.write('\n %s \n' % e)
         f.write('\n error atverot linku nr.: '.join(str(link)))
