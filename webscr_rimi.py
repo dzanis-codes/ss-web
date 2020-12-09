@@ -1,5 +1,5 @@
 
-
+##uzrakstit funkciju, kas pie None type atrašanas vienmēr ieraksta "na"
 
 import time
 from bs4 import BeautifulSoup
@@ -7,25 +7,29 @@ import sys
 import requests
 import sqlite3
 import re
+import traceback
 
-conn = sqlite3.connect('result01rimi.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
+conn = sqlite3.connect('result01rimi.db') 
 c = conn.cursor()
 
 def savaksana(links):
-    r = requests.get(links, verify = False)
-    time.sleep(4)
+    r = requests.get(links)
+    time.sleep(1)
     soup = BeautifulSoup(r.content, 'html.parser')
 
     p_data = soup.find("ul", {"class": "product-grid"})
     item_data = p_data.find_all("li", {"class": "product-grid__item"})
-    for item in item_data[0:12]:
+    for item in item_data:
 
-        print("...")
-        #1.dati
+
         produkta_id = item.find("div")['data-product-code']
         prod_nosaukums = item.find("div")['data-gtms-click-name']
         prod_links = item.find("a")['href']
-        prod_nosaukums2 = item.find("p", {"class": "card__name"}).text
+        if type(item.find("p", {"class": "card__name"})) == type(item.find("p", {"class": "tests nav miris"})):
+            prod_nosaukums2 = "na"
+        
+        else:
+            prod_nosaukums2 = item.find("p", {"class": "card__name"}).text
         prod_internal_data = item.find("div")['data-gtm-eec-product']
         cena_tag = item.find("div", {"class": "card__price"})
         cenas_komp=[]
@@ -42,12 +46,16 @@ def savaksana(links):
 
             cena = str(cenas_komp[1]) +"." + str(cenas_komp[4].text)
             cena_parko = cenas_komp[6].text
-
-            pilna_cena_tag = item.find("p", {"class": "card__price-per"}).text
-            pilna_cena = re.sub(r"[\n\t\s]*", "", pilna_cena_tag)
+            
+            if type(item.find("p", {"class": "card__price-per"})) == type(item.find("p", {"class": "tests nav miris"})):
+                pilna_cena = "na"
+            else:
+                pilna_cena_tag = item.find("p", {"class": "card__price-per"}).text
+                pilna_cena = re.sub(r"[\n\t\s]*", "", pilna_cena_tag)
 
             if type(item.find("p", {"class": "card__old-price"})) != type(item.find("p", {"class": "tests nav miris"})):
                 old_price_tag = item.find("p", {"class": "card__old-price"}).text
+                discount = "yes"
 
                 cena_pirms_atl = re.sub(r"[\n\t\s]*", "", old_price_tag)
             else:
@@ -82,7 +90,7 @@ linku_saraksts = ('https://www.rimi.lv/e-veikals/lv/produkti/augli-un-darzeni/c/
 linka_nr = 0
 while linka_nr < len(linku_saraksts):
     try:
-        r = requests.get(linku_saraksts[linka_nr], verify = False)
+        r = requests.get(linku_saraksts[linka_nr])
         time.sleep(5)
         soup = BeautifulSoup(r.content, 'html.parser')
 
@@ -99,13 +107,15 @@ while linka_nr < len(linku_saraksts):
 
         linka_nr += 1
     except Exception as e:
-        f = open('log_rimi.txt', 'a+')
+        f = open('errorlog_rimi.txt', 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
 
         f.write('\n %s \n' % e)
+        tb = traceback.TracebackException.from_exception(e)
+        f.write('\n'.join(tb.stack.format()))            
         f.write('\n %s \n' % timestamp)
-        f.write('\n error atverot linku nr.: '.join(str(linka_nr)))
+
         f.close()
         time.sleep(10)
         pass        
