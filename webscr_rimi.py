@@ -53,8 +53,8 @@ def savaksana(links):
                 pilna_cena_tag = item.find("p", {"class": "card__price-per"}).text
                 pilna_cena = re.sub(r"[\n\t\s]*", "", pilna_cena_tag)
 
-            if type(item.find("p", {"class": "card__old-price"})) != type(item.find("p", {"class": "tests nav miris"})):
-                old_price_tag = item.find("p", {"class": "card__old-price"}).text
+            if type(item.find("div", {"class": "old-price-tag card__old-price"})) != type(item.find("p", {"class": "tests nav miris"})):
+                old_price_tag = item.find("div", {"class": "old-price-tag card__old-price"}).text
                 discount = "yes"
 
                 cena_pirms_atl = re.sub(r"[\n\t\s]*", "", old_price_tag)
