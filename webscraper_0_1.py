@@ -9,15 +9,16 @@ import sqlite3
 
 
 
-conn = sqlite3.connect('result02.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
+conn = sqlite3.connect('sscom_v3.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
 
 ## šeit tiek izveidota katru nedēļu jauna tabula, ja diena ir otrdiena
-table_title = "results-" + time.strftime("%U", time.localtime()) + "-" + time.strftime("%U", time.localtime())
+table_title = "results-" + time.strftime("%y", time.gmtime()) + "-" + time.strftime("%w", time.gmtime())
+c.execute('''CREATE TABLE IF NOT EXISTS {}
+           (name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp)'''.format(table_title))
+conn.commit()
 
-CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT, ...)
-c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
 
 saraksts_darij = ["sell", "hand_over"]
 saraksts_veids = ["flats", "homes-summer-residences", "farms-estates", "offices", "plots-and-lands"]
@@ -148,7 +149,7 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         transaction_type = saraksts_darij[darijuma_veids]
         sql_entry = (id_text, str(ad_text), majas_stavs, str(location_detailed), platiba_m2, land_m2, house_type, cena, linky, avots, estate_type, transaction_type, timestamp) 
         ## db file structure: name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp
-        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+        c.execute("INSERT INTO {} VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(table_title), sql_entry)
         
         conn.commit()
         
@@ -164,7 +165,8 @@ while ipasuma_veids < 5:
                         try:
                             ss_scraping(lpp, ipasuma_veids,darijuma_veids)
                         except Exception as e:
-                            f = open('log_ss.txt', 'a+')
+                            logfile = "log_ss_" + table_title
+                            f = open(logfile, 'a+')
                             ts = time.gmtime()
                             timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
                             ## Šeit jāsaformatē error logging
