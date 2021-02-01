@@ -80,24 +80,6 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         ad_text = data[2].get_text()
         location_detailed = tr.contents[3].contents ## vai var uzlavot ar data.get_text?
         
-        ##tālāk variants kā sadalīt adresi divos gabalos; vajadzīgi uzlabojumi, pirmkārt tur kur adrese ir kā viens list item
-        ##otrkārt, varūt jāatstaj tikai pilsēta
-        ##treškārt, iespējams efektīvāk to darīt no linka
-        
-       # location_detailed = tr.contents[3].contents ## vai var uzlavot ar data.get_text?
-        #print("adrese")
-
-#        adrese_x = ""
-    #    for a in location_detailed:
-       #     adrese_x += str(a)
-
-     #   adrese_x.strip('<b>')
-     #   adrese_x.strip('</b>')
-
-    #    adrese_b=adrese_x.split('<br/>')
-
-    #    print(adrese_b[0])
-    #    print(adrese_b[1])        
 
         #galvenā datu sagrupēšanas sadaļa no veidiem
         
@@ -173,10 +155,8 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
 
 ipasuma_veids = 0
 while ipasuma_veids < 5:
-        try:
-                for darijuma_veids in range(2):
-                    for lpp in range(lpp_skaits):
-                        
+    for darijuma_veids in range(2):
+        for lpp in range(lpp_skaits):                      
                         try:
                             ss_scraping(lpp, ipasuma_veids,darijuma_veids)
                         except Exception as e:
@@ -193,7 +173,7 @@ while ipasuma_veids < 5:
                         continue
 
                         time.sleep(1)
-        ipasuma_veids += 1
+    ipasuma_veids += 1
 
 sys.exit()
     
