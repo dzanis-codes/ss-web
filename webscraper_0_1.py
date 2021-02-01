@@ -1,6 +1,5 @@
-## pedejas izmaiņas:
-## 1. izņēmu csv rakstīšanu ārā
-## 2. pamainīšu datubāzi un šo jāpalaiž kā papildu jaunu event paralēli vecajam... ja nu kaut kas nobrūk
+## pedejas izmaiņas: 2021-02-01 Tā kā tika lietots vākšanai atjaunots
+##Pielieku klāt lai tiek gatavoti katrai nedēļai sava tabula
 
 import sys
 import requests
@@ -10,11 +9,16 @@ import sqlite3
 
 
 
-## Datubāzei vairāki papildinājumi: pielikt kolonnu "saite", kolonnu "darijums - ar opciju pardod/izire", kolonnu "avots", kur bus ss.com, kolonnu "nek.veids" 
-## ar attieciguiem mainigajiem dzivoklis, maja, zeme, vasarnica, telpas, biroji
-## un tad vēl jaunas kolonnas zemes pl. (kur ir m2 vai ha vai na) 
 conn = sqlite3.connect('result02.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
+
+
+## šeit tiek izveidota katru nedēļu jauna tabula, ja diena ir otrdiena
+table_title = "results-" + time.strftime("%U", time.localtime()) + "-" + time.strftime("%U", time.localtime())
+
+CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT, ...)
+c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+
 saraksts_darij = ["sell", "hand_over"]
 saraksts_veids = ["flats", "homes-summer-residences", "farms-estates", "offices", "plots-and-lands"]
         
