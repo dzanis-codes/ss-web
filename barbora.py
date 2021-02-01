@@ -4,17 +4,23 @@ from bs4 import BeautifulSoup
 import json
 import requests
 from selenium.webdriver.firefox.options import Options
+import sys
+import sqlite3
 
 
-
-#driver.get("https://www.barbora.lv/piena-produkti-un-olas/?order=SortByPopularity&page=20")
 
 #soup = BeautifulSoup(driver.page_source, 'html.parser')
 
 #g_data = soup.find("ul", {"class": "pagination"})
 
+conn = sqlite3.connect('barbora_v1.db') 
+c = conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS results
+           (name_id INTEGER PRIMARY KEY, produkta_id, prod_nosaukums, prod_cena, prod_kategorija, prod_isiedati, prod_pilniedati avots, timestamp)''')
 
 
+# Save (commit) the changes
+conn.commit()
 
 def skaita_lapas(pagination):
 
@@ -57,6 +63,15 @@ def savaksana(url):
         prod_nr = pdati.get("product_position_in_list")
         print(prod_nr)
         print(prod_nosaukums, "..", prod_cena)
+        avots = "barbora"
+        ts = time.gmtime()
+        timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
+        
+        #šeit tiek apkopoti visi savāktie dati, tiek "izprintēti" bugfixing nolūkiem un tad tiek ievietoti datubāzē
+        sql_entry = (str(prod_id), str(prod_nosaukums), str(prod_cena), str(prod_kategorija), str(produkta_isiedati), str(produkta_pilniedati), str(avots), timestamp)
+        print(sql_entry)
+        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+        conn.commit()
     return max_lapa
     
 
@@ -82,9 +97,9 @@ while linka_nr < len(linku_saraksts):
 
     try:
         #webdraiveris atver, uzklikšķina uz Rīgas un tad atver linku
-        options = Options()
-        options.headless = True
-        driver = webdriver.Firefox(options = options)
+        #options = Options()
+        #options.headless = True
+        driver = webdriver.Firefox() #options = options
         driver.get("https://www.barbora.lv")
         time.sleep(5)
         driver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[1]/div/button').click()
@@ -117,6 +132,8 @@ while linka_nr < len(linku_saraksts):
             max_lapa = savaksana(new_url)
 
             lapa += 1
+        
+        linka_nr += 1
         driver.quit()
         time.sleep(5)
 
@@ -127,10 +144,18 @@ while linka_nr < len(linku_saraksts):
     #šeit pie jebkuras kļūdas augstākesošajā 'try' sadaļā kļūda tiek ielogota ar timestamp un paņemta 10 sekunžu pauze
     #šo sadaļu var saīsināt
     except Exception as e:
-        print("e...........")
-        time.sleep(5)
-        print('\n %s \n' % e)
-        pass
+        f = open('errorlog_Barbora.txt', 'a+')
+        ts = time.gmtime()
+        timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
+        f.write('\n %s \n' % e)
+        tb = traceback.TracebackException.from_exception(e)
+        f.write('\n'.join(tb.stack.format()))            
+        f.write('\n %s \n' % timestamp)
+        f.close()
+        time.sleep(10)
+        pass     
+
+sys.exit()
 # https://www.barbora.lv/augli-un-darzeni?order=SortByPopularity&page=1
 
 #https://stackoverflow.com/questions/60319045/mozilla-firefox-68-2-0esr-browser-is-crashing-using-geckodriver-and-selenium
@@ -142,3 +167,10 @@ while linka_nr < len(linku_saraksts):
 #...
 #driver = webdriver.Chrome(chrome_options=chrome_options)
 #driver.create_options()
+
+
+
+
+
+
+#https://stackoverflow.com/questions/35284101/selenium-firefox-headless-running-issue-in-python
