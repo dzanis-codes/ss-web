@@ -14,9 +14,9 @@ c = conn.cursor()
 
 
 ## šeit tiek izveidota katru nedēļu jauna tabula, ja diena ir otrdiena
-table_title = "results-" + time.strftime("%y", time.gmtime()) + "-" + time.strftime("%w", time.gmtime())
-c.execute('''CREATE TABLE IF NOT EXISTS {}
-           (name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp)'''.format(table_title))
+#table_title = "results-" + time.strftime("%y", time.gmtime()) + "-" + time.strftime("%w", time.gmtime())
+c.execute('''CREATE TABLE IF NOT EXISTS results
+           (name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp)''')
 conn.commit()
 
 
@@ -149,7 +149,7 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         transaction_type = saraksts_darij[darijuma_veids]
         sql_entry = (id_text, str(ad_text), majas_stavs, str(location_detailed), platiba_m2, land_m2, house_type, cena, linky, avots, estate_type, transaction_type, timestamp) 
         ## db file structure: name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp
-        c.execute("INSERT INTO {} VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(table_title), sql_entry)
+        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         
         conn.commit()
         
