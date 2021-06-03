@@ -1,5 +1,11 @@
-#!/usr/local/bin/python
-# coding: latin-1
+## !!pagaidām vajag laist 2x dienā
+
+## uzlabojumi - 
+## 1. linkus varētu ņemt no sitemap, bet tad vajadzīgs spiest uz pogām par jaunākajiem
+## 2. ja uzspiestu uz otrās dzīvokļu lapas, tad varētu ņemt retāk
+## 3. sludinajumu kategorijas sale/rent varētu ņemt no lapas
+## 4. sadalīt plot tekstu pareizi
+## 5. var mēģināt vērt katru sludinajumu no pilnā sitemap vaļā un saglabāt arī vairāk info
 
 import time
 from bs4 import BeautifulSoup
@@ -8,7 +14,7 @@ import sqlite3
 import requests
 import traceback
 
-conn = sqlite3.connect('result01c24.db') ## jaapapildina datubaze ar kolonnam; nosaukt jaunu datubazes failu
+conn = sqlite3.connect('result01c24.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
 link_list = ('https://www.city24.lv/en/list/sale/rent/houses?str=2&lang=en&c=LV&tt=1&it=8&ord=sort-date-desc&fr=0', 'https://www.city24.lv/en/list/sale/rent/apartments?str=2&lang=en&c=LV&tt=1&it=18&ord=sort-date-desc&fr=0')
