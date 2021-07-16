@@ -7,6 +7,7 @@ import sqlite3
 import requests
 import traceback
 from selenium import webdriver
+import unicodedata
 
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
@@ -56,12 +57,13 @@ def glabat_slud(link, type):
        
 
         cena_tag = g_data[count].find("div", {"class": "object-price__main-price"})
-        cena = cena_tag.text
+        cena_c = cena_tag.text
+        cena = unicodedata.normalize("NFKD", cena_c)
         print(cena)
         
         cena_m2_tag = g_data[count].find("div", {"class": "object-price__m2-price"})
-        cena_m2 = cena_m2_tag.text
-
+        cena_m2_c = cena_m2_tag.text
+        cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
         apraksts = citsinfo
 
