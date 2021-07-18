@@ -1,5 +1,4 @@
 
-
 import time
 from bs4 import BeautifulSoup
 import sys
@@ -8,12 +7,21 @@ import requests
 import traceback
 from selenium import webdriver
 import unicodedata
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 options = webdriver.ChromeOptions()
+#options.add_argument('--window-size=800,400')  
 options.add_argument('--headless')
+
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 # open it, go to a website, and get results
+
+
+
+
 
 
 
@@ -26,7 +34,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS results
 
 # Save (commit) the changes
 conn.commit()
-link_list = ('https://www.city24.lv/en/list/sale/rent/houses?str=2&lang=en&c=LV&tt=1&it=8&ord=sort-date-desc&fr=0', 'https://www.city24.lv/en/list/sale/rent/apartments?str=2&lang=en&c=LV&tt=1&it=18&ord=sort-date-desc&fr=0')
+link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale', 'https://www.city24.lv/real-estate-search/apartments-for-sale', 'https://www.city24.lv/real-estate-search/houses-for-rent', 'https://www.city24.lv/real-estate-search/apartments-for-rent')
 
 
 def glabat_slud(link, type):
@@ -35,6 +43,16 @@ def glabat_slud(link, type):
  
     driver.get(link)
     time.sleep(5)
+    #a = driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]')
+    #print(a)
+    driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]').click()
+    time.sleep(3)
+    #b = driver.find_element_by_css_selector('[class="select__value"]')
+    #print(b)
+    driver.find_element_by_css_selector('[class="select__value"]').click()
+
+    driver.find_element_by_css_selector('[value = "datePublished-desc"]').click()
+    time.sleep(5)
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     
@@ -42,7 +60,7 @@ def glabat_slud(link, type):
     
     print(len(g_data))
     print("..")
-    print(g_data[1])
+
 
     for count in range(len(g_data)):
         ad_link = g_data[count].find("a")['href']
@@ -68,16 +86,25 @@ def glabat_slud(link, type):
         apraksts = citsinfo
 
         platiba = g_data[count].find_all('ul')[0].text
-        istabas = g_data[count].find_all('li')[1].text
-        if len(g_data[count].find_all('li')) > 2:
-          stavi = g_data[count].find_all('li')[2].text
+        
+        if len(g_data[count].find_all('li')) > 1:
+            if len(g_data[count].find_all('li')) > 2:
+                stavi = g_data[count].find_all('li')[2].text
+            else:
+                stavi = "1"
+            istabas = g_data[count].find_all('li')[1].text
         else:
-          stavi = "1"
+            stavi = "1"
+            istabas = "na"
         ad_id = "na"
         if type == 0:
-          estate_type = "House"
+            estate_type = "House for sale"
+        elif type == 1:
+            estate_type = "Appartment for sale"
+        elif type == 2:
+            estate_type = "House for rent"
         else:
-          estate_type = "Appartment"
+            estate_type = "Appartment for rent"
         ts = time.gmtime()
         stamp = time.strftime("%Y-%m-%d %H:%M:%S", ts)
         print(" adrese: "+ adrese + " ad id: "+ad_id + "cena:  "+cena+ "platiba, istabas un stavi" + platiba + istabas+ stavi, stamp)
@@ -90,7 +117,7 @@ def glabat_slud(link, type):
 
 print("1")
 link = 0
-while link != 2:
+while link != 4:
     try:
         print("2")
 
