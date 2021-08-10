@@ -40,22 +40,26 @@ link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale', 'https:
 def glabat_slud(link, type):
     print(link)
     driver = webdriver.Chrome('chromedriver',options=options)
+    print("..4")
  
     driver.get(link)
     time.sleep(5)
+    print("..5")
     #a = driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]')
     #print(a)
     driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]').click()
     time.sleep(3)
+    print("..6")
     #b = driver.find_element_by_css_selector('[class="select__value"]')
     #print(b)
     driver.find_element_by_css_selector('[class="select__value"]').click()
-
+    print("..7")
+    time.sleep(3)
     driver.find_element_by_css_selector('[value = "datePublished-desc"]').click()
     time.sleep(5)
-
+    print("..8")
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    
+    print("..9")
     g_data = soup.find_all("div", {"class": "object object--list object--result"})
     
     print(len(g_data))
@@ -69,9 +73,14 @@ def glabat_slud(link, type):
         adrese_tag = g_data[count].find("a", {"class": "object__location"})
         #print(adrese_tag)
         print("3")
-        adrese = adrese_tag.text
+        street = adrese_tag.find("h3", {"class": "object__address"}).text
+        region = adrese_tag.find("div", {"class": "object__area"}).text
+        #adrese = adrese_tag.text
+        adrese = str(street) + "; " + str(region)
         print(adrese)
-        #šo var sadalīt divos lielumos
+
+
+
        
 
         cena_tag = g_data[count].find("div", {"class": "object-price__main-price"})
@@ -80,22 +89,39 @@ def glabat_slud(link, type):
         print(cena)
         
         cena_m2_tag = g_data[count].find("div", {"class": "object-price__m2-price"})
-        cena_m2_c = cena_m2_tag.text
-        cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
+        if cena_m2_tag == None:
+            cena_m2 = "na"
+        else:
+            cena_m2_c = cena_m2_tag.text
+            cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
         apraksts = citsinfo
 
-        platiba = g_data[count].find_all('ul')[0].text
-        
-        if len(g_data[count].find_all('li')) > 1:
-            if len(g_data[count].find_all('li')) > 2:
-                stavi = g_data[count].find_all('li')[2].text
-            else:
-                stavi = "1"
-            istabas = g_data[count].find_all('li')[1].text
+        check_platiba = g_data[count].find_all('ul')[0].text
+        if "m" in check_platiba: 
+            platiba = g_data[count].find_all('li')[0].text
         else:
-            stavi = "1"
+            platiba = "na"
+
+
+        main_features = g_data[count].find_all('ul')[0]
+        #atrodam stavus
+
+
+        if main_features.find("span", {"class": "icon icon-stairs"}) == None:
+            stavi = "na"
+        else:
+            stavi = main_features.find("span", {"class": "icon icon-stairs"}).parent.text
+
+        #atrodam istabas
+        if main_features.find("span", {"class": "icon icon-door"}) == None:
             istabas = "na"
+        else:
+            istabas = main_features.find("span", {"class": "icon icon-door"}).parent.text
+
+
+
+
         ad_id = "na"
         if type == 0:
             estate_type = "House for sale"
@@ -107,7 +133,7 @@ def glabat_slud(link, type):
             estate_type = "Appartment for rent"
         ts = time.gmtime()
         stamp = time.strftime("%Y-%m-%d %H:%M:%S", ts)
-        print(" adrese: "+ adrese + " ad id: "+ad_id + "cena:  "+cena+ "platiba, istabas un stavi" + platiba + istabas+ stavi, stamp)
+        print(" adrese: ", adrese, " ad id: ",ad_id, "cena:  ", cena, "platiba, istabas un stavi", platiba, istabas, stavi, stamp)
         sql_entry = (str(ad_id), str(apraksts), str(stavi), str(adrese), str(platiba), "land?", str(cena), str(cena_m2), str(ad_link), "c24", estate_type, str(istabas), stamp) 
         ## db file structure: INTEGER PRIMARY KEY, ad_id, apraksts, stavs, adrese, premise_m2, land_m2, cena, cena_m2, ad_link, ad_source, estate_type, istabas, timestamp
         c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
@@ -116,7 +142,7 @@ def glabat_slud(link, type):
         print(sql_entry)
 
 print("1")
-link = 0
+link = 1
 while link != 4:
     try:
         print("2")
