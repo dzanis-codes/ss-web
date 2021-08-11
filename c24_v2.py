@@ -1,4 +1,3 @@
-
 import time
 from bs4 import BeautifulSoup
 import sys
@@ -11,58 +10,51 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 options = webdriver.ChromeOptions()
 #options.add_argument('--window-size=800,400')  
 options.add_argument('--headless')
-
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
-# open it, go to a website, and get results
 
-
-
-
-
-
-
-
-conn = sqlite3.connect('result01c24.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
+path = '/LBData/RealEstate/result01c24.db'
+conn = sqlite3.connect(path) 
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS results
            (name_id INTEGER PRIMARY KEY, ad_id, apraksts, stavs, adrese, premise_m2, land_m2, cena, cena_m2, ad_link, ad_source, estate_type, istabas, timestamp)''')
-
-
 # Save (commit) the changes
 conn.commit()
+
+
 link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale', 'https://www.city24.lv/real-estate-search/apartments-for-sale', 'https://www.city24.lv/real-estate-search/houses-for-rent', 'https://www.city24.lv/real-estate-search/apartments-for-rent')
 
 
 def glabat_slud(link, type):
     print(link)
     driver = webdriver.Chrome('chromedriver',options=options)
-    print("..4")
+    #print("..4")
  
     driver.get(link)
     time.sleep(5)
-    print("..5")
+    #print("..5")
     #a = driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]')
     #print(a)
     driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]').click()
     time.sleep(3)
-    print("..6")
+    #print("..6")
     #b = driver.find_element_by_css_selector('[class="select__value"]')
     #print(b)
     driver.find_element_by_css_selector('[class="select__value"]').click()
-    print("..7")
+    #print("..7")
     time.sleep(3)
     driver.find_element_by_css_selector('[value = "datePublished-desc"]').click()
     time.sleep(5)
-    print("..8")
+    #print("..8")
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    print("..9")
+    #print("..9")
     g_data = soup.find_all("div", {"class": "object object--list object--result"})
     
-    print(len(g_data))
+    #print(len(g_data))
     print("..")
 
 
@@ -79,10 +71,6 @@ def glabat_slud(link, type):
         adrese = str(street) + "; " + str(region)
         print(adrese)
 
-
-
-       
-
         cena_tag = g_data[count].find("div", {"class": "object-price__main-price"})
         cena_c = cena_tag.text
         cena = unicodedata.normalize("NFKD", cena_c)
@@ -95,7 +83,7 @@ def glabat_slud(link, type):
             cena_m2_c = cena_m2_tag.text
             cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
-        apraksts = citsinfo
+        apraksts = citsinfo.text
 
         check_platiba = g_data[count].find_all('ul')[0].text
         if "m" in check_platiba: 
@@ -103,11 +91,8 @@ def glabat_slud(link, type):
         else:
             platiba = "na"
 
-
         main_features = g_data[count].find_all('ul')[0]
         #atrodam stavus
-
-
         if main_features.find("span", {"class": "icon icon-stairs"}) == None:
             stavi = "na"
         else:
@@ -118,9 +103,6 @@ def glabat_slud(link, type):
             istabas = "na"
         else:
             istabas = main_features.find("span", {"class": "icon icon-door"}).parent.text
-
-
-
 
         ad_id = "na"
         if type == 0:
@@ -141,16 +123,16 @@ def glabat_slud(link, type):
         conn.commit()
         print(sql_entry)
 
-print("1")
-link = 1
+#main
+link = 0
 while link != 4:
     try:
-        print("2")
-
+        #print("2")
         glabat_slud(link_list[link], link)
         link += 1
     except Exception as e:
-        f = open('errorlog_c24.txt', 'a+')
+        path2 = 'LBApp_log/errorlog_c24.txt'
+        f = open(path2, 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
         f.write('\n %s \n' % str(timestamp))
