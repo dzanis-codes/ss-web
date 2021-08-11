@@ -1,22 +1,33 @@
+# -*- coding: utf-8 -*-
+
 from selenium import webdriver
 import time
 from bs4 import BeautifulSoup
 import json
 import requests
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 import sys
 import sqlite3
+import traceback
 
 
 
-#soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-#g_data = soup.find("ul", {"class": "pagination"})
+chrome_options = Options()
+#chrome_options.add_argument("--disable-extensions")
+chrome_options.add_argument("--no-sandbox") # linux only
+chrome_options.add_argument("--disable-gpu")
 
-conn = sqlite3.connect('barbora_v1.db') 
+chrome_options.add_argument("--headless")
+# chrome_options.headless = True # also works
+
+
+path = '/LBData/Retail/barbora.db'
+
+conn = sqlite3.connect(path) 
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS results
-           (name_id INTEGER PRIMARY KEY, produkta_id, prod_nosaukums, prod_cena, prod_kategorija, prod_isiedati, prod_pilniedati avots, timestamp)''')
+           (name_id INTEGER PRIMARY KEY, produkta_id, prod_nosaukums, prod_cena, prod_kategorija, prod_isiedati, prod_pilniedati, avots, timestamp)''')
 
 
 # Save (commit) the changes
@@ -97,25 +108,18 @@ while linka_nr < len(linku_saraksts):
 
     try:
         #webdraiveris atver, uzklikšķina uz Rīgas un tad atver linku
-        #options = Options()
-        #options.headless = True
-        driver = webdriver.Firefox() #options = options
+
+        driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver", options=chrome_options)
+
         driver.get("https://www.barbora.lv")
         time.sleep(5)
         driver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[1]/div/button').click()
         time.sleep(5)
-
-
         driver.get(linku_saraksts[linka_nr])
         time.sleep(5)
-
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-
         g_data = soup.find("ul", {"class": "pagination"})
-
-
         lapa = 1
-
         max_lapa = skaita_lapas(g_data)
         print(max_lapa)
 
@@ -137,14 +141,12 @@ while linka_nr < len(linku_saraksts):
         driver.quit()
         time.sleep(5)
 
-
-
-
     
     #šeit pie jebkuras kļūdas augstākesošajā 'try' sadaļā kļūda tiek ielogota ar timestamp un paņemta 10 sekunžu pauze
     #šo sadaļu var saīsināt
     except Exception as e:
-        f = open('errorlog_Barbora.txt', 'a+')
+        error_path = '/LBApp_log/errorlog_Barbora.txt'
+        f = open(error_path, 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
         f.write('\n %s \n' % e)
@@ -156,21 +158,4 @@ while linka_nr < len(linku_saraksts):
         pass     
 
 sys.exit()
-# https://www.barbora.lv/augli-un-darzeni?order=SortByPopularity&page=1
 
-#https://stackoverflow.com/questions/60319045/mozilla-firefox-68-2-0esr-browser-is-crashing-using-geckodriver-and-selenium
-
-##tālākais ir chrome headless variantam
-#chrome_options = webdriver.ChromeOptions()
-#chrome_options.add_argument('--headless')
-#chrome_options.headless = True
-#...
-#driver = webdriver.Chrome(chrome_options=chrome_options)
-#driver.create_options()
-
-
-
-
-
-
-#https://stackoverflow.com/questions/35284101/selenium-firefox-headless-running-issue-in-python
