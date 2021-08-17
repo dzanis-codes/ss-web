@@ -73,7 +73,7 @@ def glabat_slud(link, type):
         print(ad_link)
         #img_link = h_data[count].find("img")['src']
         
-        adrese_tag = h_data[count].find("div", {"class": "browse-card__address__text"})
+        adrese_tag = g_data[count].find("div", {"class": "browse-card__address__text"})
         print(adrese_tag)
         adrese = adrese_tag.text
         print(adrese)
@@ -84,16 +84,32 @@ def glabat_slud(link, type):
         print(cena_tag)
         cena = cena_tag.text
         print(cena)
-        cena_m2_tag = h_data[count].find("div", {"class": "price_sqrm"})
-        cena_m2 = cena_m2_tag.text
+        rent_tag = g_data[count].find("div", {"class": "browse-card__cost__rent-per"})
+        if rent_tag != None:
+          transaction = rent_tag.text
+          print(transaction)
+        else:
+          transaction = "Sale"
 
-        citsinfo = h_data[count].find_all("div", {"class": "result_content"})
-        for item in citsinfo:
-            apraksts_tag = item.find("div", {"class": "promo"})
-            if apraksts_tag != None:
-                apraksts = apraksts_tag.text
-            else:
-                apraksts = "na"
+
+
+
+
+
+        cena_m2_tag = g_data[count].find("div", {"class": "browse-card__cost__per-area"})
+        cena_m2 = cena_m2_tag.text
+        print(cena_m2)
+
+        citsinfo = g_data[count].find_all("div", {"class": "browse-card__middle"})
+        istabas = citsinfo.find("i", {"class": "icon-bedroom"}).text
+        print(istabas)
+
+
+
+
+
+
+
         platiba = citsinfo[0].find_all('li')[0].text
         istabas = citsinfo[0].find_all('li')[1].text
         stavi = citsinfo[0].find_all('li')[2].text
