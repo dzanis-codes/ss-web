@@ -1,4 +1,7 @@
 
+#!pip install selenium
+#!apt-get update 
+#!apt install chromium-chromedriver
 
 import time
 from bs4 import BeautifulSoup
@@ -7,6 +10,16 @@ import sqlite3
 import requests
 import traceback
 
+from selenium import webdriver
+
+
+
+options = webdriver.ChromeOptions()
+#options.add_argument('--window-size=800,400')  
+options.add_argument('--headless')
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
 conn = sqlite3.connect('result01inch.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
@@ -14,11 +27,11 @@ link_list = ('https://inch.lv/browse?type=apartment&districts=R%C4%ABga&subdistr
 'https://inch.lv/browse?type=apartment&districts=J%C5%ABrmala&subdistricts=Asari%2CBulduri%2CBu%C4%BC%C4%BCuciems%2CBa%C5%BEuciems%2CBra%C5%BEciems%2CDruvciems%2CDubulti%2CDzintari%2CJaundubulti%2CJaun%C4%B7emeri%2CKauguri%2CKaugurciems%2CKrastciems%2CK%C5%ABdra%2C%C4%B6emeri%2CLielupe%2CMajori%2CMellu%C5%BEi%2CPriedaine%2CPumpuri%2CSloka%2CStirnurags%2CVaivari%2CValteri%2CV%C4%81rnukrogs',
 'https://inch.lv/browse?type=apartment&districts=R%C4%ABgas+rajons&subdistricts=%C4%80da%C5%BEu+nov.%2CBab%C4%ABtes+pag.%2CBaldones+nov.%2CBalo%C5%BEi%2CCarnikavas+nov.%2CDaugmales+pag.%2CGarkalnes+nov.%2CIn%C4%8Dukalna+nov.%2C%C4%B6ekavas+nov.%2CM%C4%81rupes+pag.%2COlaines+nov.%2CRopa%C5%BEu+nov.%2CSalas+pag.%2CSalaspils+nov.%2CSaulkrasti%2CS%C4%93jas+nov.%2CSiguldas+nov.%2CStopi%C5%86u+nov.',
 'https://inch.lv/browse?type=apartment&districts=Aizkraukle+un+raj.',
-'https://inch.lv/browse?type=apartment&districts=Al%C5%ABksne+un+raj.'
-https://inch.lv/browse?type=house&districts=Balvi+un+raj.
-https://inch.lv/browse?type=house&districts=Bauska+un+raj.
-https://inch.lv/browse?type=house&districts=C%C4%93sis+un+raj.
-https://inch.lv/browse?type=house&districts=Daugavpils+un+raj.
+'https://inch.lv/browse?type=apartment&districts=Al%C5%ABksne+un+raj.',
+'https://inch.lv/browse?type=house&districts=Balvi+un+raj.',
+'https://inch.lv/browse?type=house&districts=Bauska+un+raj.',
+'https://inch.lv/browse?type=house&districts=C%C4%93sis+un+raj.',
+'https://inch.lv/browse?type=house&districts=Daugavpils+un+raj.')
 
 
 
@@ -31,26 +44,46 @@ https://inch.lv/browse?type=house&districts=Daugavpils+un+raj.
 
 
 def glabat_slud(link, type):
-    r = requests.get(link)
-    time.sleep(4)
+    print(link)
+    driver = webdriver.Chrome('chromedriver',options=options)
+    print("..4")
+ 
+    driver.get(link)
+    time.sleep(5)
+    #r = requests.get(link)
+    #time.sleep(4)
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-    soup = BeautifulSoup(r.content, 'html.parser')
+    #print(soup)
+    g_data = soup.find_all("div", {"class": "browse-card"})
 
-    #g_data = soup.find_all("div", {"class": "results resultList"})
+#    h_data = soup.find_all("div", {"class": "browse-card-wrapper"})
+    #print(h_data)
+    #print(g_data)
 
 
-    h_data = soup.find_all("li", {"class": "new result regular"})
     for count in range(50):
-        ad_link = h_data[count].find("a")['href']
-        img_link = h_data[count].find("img")['src']
-        
-        adrese_tag = h_data[count].find("a", {"class": "addressLink"})
-        adrese = adrese_tag.text
-        ad_id = adrese_tag["name"]
+        print("count:", count)
+        print(g_data[count])
+        #ad_id = g_data[count].find("data-object-id")
+        #print(ad_id)
 
-        cena_tag = h_data[count].find("div", {"class": "price"})
-        cena = cena_tag.text
+
+        ad_link = g_data[count].find("a")['href']
+        print(ad_link)
+        #img_link = h_data[count].find("img")['src']
         
+        adrese_tag = h_data[count].find("div", {"class": "browse-card__address__text"})
+        print(adrese_tag)
+        adrese = adrese_tag.text
+        print(adrese)
+        
+
+
+        cena_tag = g_data[count].find("div", {"class": "browse-card__cost__price"})
+        print(cena_tag)
+        cena = cena_tag.text
+        print(cena)
         cena_m2_tag = h_data[count].find("div", {"class": "price_sqrm"})
         cena_m2 = cena_m2_tag.text
 
@@ -85,6 +118,7 @@ while link != 2:
         r = requests.get(link_list[link])
         soup = BeautifulSoup(r.content, 'html.parser')
         time.sleep(4)
+
         glabat_slud(link_list[link], link)
         link += 1
     except Exception as e:
