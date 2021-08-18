@@ -1,8 +1,4 @@
 
-#!pip install selenium
-#!apt-get update 
-#!apt install chromium-chromedriver
-
 import time
 from bs4 import BeautifulSoup
 import sys
@@ -60,7 +56,9 @@ def glabat_slud(link, type):
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
     #print(soup)
-    g_data = soup.find_all("div", {"class": "browse-card"})
+    g_data = soup.find_all(lambda tag: tag.name == 'div' and tag.get('class') == ['browse-card-wrapper'])
+
+    print(len(g_data))
 
 #    h_data = soup.find_all("div", {"class": "browse-card-wrapper"})
     #print(h_data)
@@ -69,9 +67,10 @@ def glabat_slud(link, type):
 #vajag range pareizi saskaitīt
     for count in range(120):
         print("count:", count)
-        #print(g_data[count])
+        print(g_data[count])
         #ad_id = g_data[count].find("data-object-id")
         #print(ad_id)
+
 
 
         ad_link = g_data[count].find("a")['href']
@@ -111,7 +110,7 @@ def glabat_slud(link, type):
         #istabas = citsinfo.find("i", {"class": "icon-bedroom"})
         #print(istabas)
         stavs = desc_list[1].text
-        stavi = stavs
+        stavi_kopa = stavs
 
         #stavs = citsinfo.find("i", {"class": "icon-staircase"})
         #print(stavs)
@@ -129,7 +128,7 @@ def glabat_slud(link, type):
         sql_entry = (str(ad_link), str(stavi_kopa), str(adrese), str(platiba), "land?", str(cena), str(cena_m2), "inch.lv", str(transaction), "appartment", str(istabas), stamp) 
         print(sql_entry)
 
-        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         
         conn.commit()
         print(sql_entry)
