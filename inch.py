@@ -22,6 +22,11 @@ options.add_argument('--disable-dev-shm-usage')
 
 conn = sqlite3.connect('result01inch.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS results
+           (name_id INTEGER PRIMARY KEY, ad_link, stavi_kopa, adrese, platiba, land, cena, cena_m2, source, transaction_type, estate_type, istabas, stamp)''')
+# Save (commit) the changes
+conn.commit()
+
 
 link_list = ('https://inch.lv/browse?type=apartment&districts=R%C4%ABga&subdistricts=Centrs%2CP%C4%81rdaugava%2C%C4%80genskalns%2CBeberbe%C4%B7i+%28mukupurvs%29%2CBieri%C5%86i-Atg%C4%81zene%2CBi%C5%A1umui%C5%BEa%2CBer%C4%A3i%2CBolder%C4%81ja%2CBukulti%2CBu%C4%BC%C4%BCi%2C%C4%8Ciekurkalns%2CD%C4%81rzciems%2CDaugavgr%C4%ABva%2CDreili%C5%86i%2CDzirciems%2CI%C4%BC%C4%A3uciems%2CImanta%2CJaunciems%2CJugla%2CKatlakalns%2C%C4%B6engarags%2C%C4%B6%C4%ABpsala%2CKleisti%2CKl%C4%ABversala%2CKrasta+rajons%2CManga%C4%BCi+%28m%C4%ABlgr%C4%81vis%29%2CManga%C4%BCsala%2CMaskavas+priek%C5%A1pils.%2CMe%C5%BEaparks%2CMe%C5%BEciems%2CP%C4%BCavnieki%2CPurvciems%2CRumbula%2C%C5%A0amp%C4%93teris-Pleskod%C4%81le%2CSarkandaugava%2C%C5%A0%C4%B7irotava%2CSpilve%2CSu%C5%BEi%2CTeika+%28VEF%29%2CTor%C5%86akalns%2CTr%C4%ABsciems%2CVec%C4%81%C4%B7i%2CVecdaugava%2CVecmilgr%C4%81vis%2CVecr%C4%ABga%2CVoleri%2CZa%C4%B7usala-Lucavsala%2CZasulauks%2CZiepniekkalns%2CZolit%C5%ABde', 
 'https://inch.lv/browse?type=apartment&districts=J%C5%ABrmala&subdistricts=Asari%2CBulduri%2CBu%C4%BC%C4%BCuciems%2CBa%C5%BEuciems%2CBra%C5%BEciems%2CDruvciems%2CDubulti%2CDzintari%2CJaundubulti%2CJaun%C4%B7emeri%2CKauguri%2CKaugurciems%2CKrastciems%2CK%C5%ABdra%2C%C4%B6emeri%2CLielupe%2CMajori%2CMellu%C5%BEi%2CPriedaine%2CPumpuri%2CSloka%2CStirnurags%2CVaivari%2CValteri%2CV%C4%81rnukrogs',
@@ -46,10 +51,10 @@ link_list = ('https://inch.lv/browse?type=apartment&districts=R%C4%ABga&subdistr
 def glabat_slud(link, type):
     print(link)
     driver = webdriver.Chrome('chromedriver',options=options)
-    print("..4")
+    print("..x")
  
     driver.get(link)
-    time.sleep(5)
+    time.sleep(4)
     #r = requests.get(link)
     #time.sleep(4)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -61,10 +66,10 @@ def glabat_slud(link, type):
     #print(h_data)
     #print(g_data)
 
-
-    for count in range(50):
+#vajag range pareizi saskaitīt
+    for count in range(120):
         print("count:", count)
-        print(g_data[count])
+        #print(g_data[count])
         #ad_id = g_data[count].find("data-object-id")
         #print(ad_id)
 
@@ -74,14 +79,14 @@ def glabat_slud(link, type):
         #img_link = h_data[count].find("img")['src']
         
         adrese_tag = g_data[count].find("div", {"class": "browse-card__address__text"})
-        print(adrese_tag)
+        #print(adrese_tag)
         adrese = adrese_tag.text
         print(adrese)
         
 
 
         cena_tag = g_data[count].find("div", {"class": "browse-card__cost__price"})
-        print(cena_tag)
+        #print(cena_tag)
         cena = cena_tag.text
         print(cena)
         rent_tag = g_data[count].find("div", {"class": "browse-card__cost__rent-per"})
@@ -92,38 +97,39 @@ def glabat_slud(link, type):
           transaction = "Sale"
 
 
-
-
-
-
         cena_m2_tag = g_data[count].find("div", {"class": "browse-card__cost__per-area"})
         cena_m2 = cena_m2_tag.text
         print(cena_m2)
 
-        citsinfo = g_data[count].find_all("div", {"class": "browse-card__middle"})
-        istabas = citsinfo.find("i", {"class": "icon-bedroom"}).text
-        print(istabas)
+        citsinfo = g_data[count].find("div", {"class": "browse-card__middle"})
+        desc_list = citsinfo.find_all("div", {"class": "browse-card__item"}) 
+        #print(len(desc_list))
+        for a in range(len(desc_list)):
+            #print(desc_list[a])
+            print(desc_list[a].text)
+        istabas = desc_list[0].text
+        #istabas = citsinfo.find("i", {"class": "icon-bedroom"})
+        #print(istabas)
+        stavs = desc_list[1].text
+        stavi = stavs
+
+        #stavs = citsinfo.find("i", {"class": "icon-staircase"})
+        #print(stavs)
+        platiba = istabas = desc_list[2].text
 
 
 
 
-
-
-
-        platiba = citsinfo[0].find_all('li')[0].text
-        istabas = citsinfo[0].find_all('li')[1].text
-        stavi = citsinfo[0].find_all('li')[2].text
         
-        if type == 0:
-          estate_type = "House"
-        else:
-          estate_type = "Appartment"
+
+
         ts = time.gmtime()
         stamp = time.strftime("%Y-%m-%d %H:%M:%S", ts)
-        print(" adrese: "+ adrese + " ad id: "+ad_id + "cena:  "+cena+ "platiba, istabas un stavi" + platiba + istabas+ stavi, stamp)
-        sql_entry = (str(ad_id), str(apraksts), str(stavi), str(adrese), str(platiba), "land?", str(cena), str(cena_m2), str(ad_link), "c24", estate_type, str(istabas), stamp) 
-        ## db file structure: INTEGER PRIMARY KEY, ad_id, apraksts, stavs, adrese, premise_m2, land_m2, cena, cena_m2, ad_link, ad_source, estate_type, istabas, timestamp
-        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+
+        sql_entry = (str(ad_link), str(stavi_kopa), str(adrese), str(platiba), "land?", str(cena), str(cena_m2), "inch.lv", str(transaction), "appartment", str(istabas), stamp) 
+        print(sql_entry)
+
+        c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         
         conn.commit()
         print(sql_entry)
