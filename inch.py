@@ -65,9 +65,9 @@ def glabat_slud(link, type):
     #print(g_data)
 
 #vajag range pareizi saskaitīt
-    for count in range(120):
+    for count in range(len(g_data)):
         print("count:", count)
-        print(g_data[count])
+        #print(g_data[count])
         #ad_id = g_data[count].find("data-object-id")
         #print(ad_id)
 
@@ -131,10 +131,10 @@ def glabat_slud(link, type):
         c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
         
         conn.commit()
-        print(sql_entry)
 
-link = 0
-while link != 2:
+
+link = 3
+while link != 6:
     try:
         r = requests.get(link_list[link])
         soup = BeautifulSoup(r.content, 'html.parser')
