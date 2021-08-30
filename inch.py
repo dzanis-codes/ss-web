@@ -29,11 +29,32 @@ link_list = ('https://inch.lv/browse?type=apartment&districts=R%C4%ABga&subdistr
 'https://inch.lv/browse?type=apartment&districts=R%C4%ABgas+rajons&subdistricts=%C4%80da%C5%BEu+nov.%2CBab%C4%ABtes+pag.%2CBaldones+nov.%2CBalo%C5%BEi%2CCarnikavas+nov.%2CDaugmales+pag.%2CGarkalnes+nov.%2CIn%C4%8Dukalna+nov.%2C%C4%B6ekavas+nov.%2CM%C4%81rupes+pag.%2COlaines+nov.%2CRopa%C5%BEu+nov.%2CSalas+pag.%2CSalaspils+nov.%2CSaulkrasti%2CS%C4%93jas+nov.%2CSiguldas+nov.%2CStopi%C5%86u+nov.',
 'https://inch.lv/browse?type=apartment&districts=Aizkraukle+un+raj.',
 'https://inch.lv/browse?type=apartment&districts=Al%C5%ABksne+un+raj.',
-'https://inch.lv/browse?type=house&districts=Balvi+un+raj.',
-'https://inch.lv/browse?type=house&districts=Bauska+un+raj.',
-'https://inch.lv/browse?type=house&districts=C%C4%93sis+un+raj.',
-'https://inch.lv/browse?type=house&districts=Daugavpils+un+raj.')
+'https://inch.lv/browse?type=apartment&districts=Balvi+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Bauska+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=C%C4%93sis+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Daugavpils+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Dobele+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Gulbene+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=J%C4%93kabpils+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Jelgava+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Kr%C4%81slava+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Kuld%C4%ABga+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Liep%C4%81ja+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Limba%C5%BEi+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Ludza+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Madona+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Ogre+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Prei%C4%BCi+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=R%C4%93zekne+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Saldus+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Talsi+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Tukums+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Valka+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Valmiera+un+raj.',
+'https://inch.lv/browse?type=apartment&districts=Ventspils+un+raj.')
 
+
+type_list ('apartment', 'house', 'land', 'commercial&subtype=office', 'commercial&subtype=trade', 'commercial&subtype=industrial')
 
 
 
