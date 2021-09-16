@@ -54,7 +54,7 @@ link_list = ('https://inch.lv/browse?type=apartment&districts=R%C4%ABga&subdistr
 'https://inch.lv/browse?type=apartment&districts=Ventspils+un+raj.')
 
 
-type_list ('apartment', 'house', 'land', 'commercial&subtype=office', 'commercial&subtype=trade', 'commercial&subtype=industrial')
+type_list = ('apartment', 'house', 'land', 'commercial&subtype=office', 'commercial&subtype=trade', 'commercial&subtype=industrial')
 
 
 
@@ -154,12 +154,12 @@ def glabat_slud(link, type):
         conn.commit()
 
 
-link = 3
-while link != 6:
+link = 0
+while link != len(link_list):
     try:
-        r = requests.get(link_list[link])
-        soup = BeautifulSoup(r.content, 'html.parser')
-        time.sleep(4)
+        #r = requests.get(link_list[link])
+        #soup = BeautifulSoup(r.content, 'html.parser')
+        time.sleep(5)
 
         glabat_slud(link_list[link], link)
         link += 1
