@@ -131,7 +131,7 @@ while link != 4:
         glabat_slud(link_list[link], link)
         link += 1
     except Exception as e:
-        path2 = 'LBApp_log/errorlog_c24.txt'
+        path2 = '/LBApp_log/errorlog_c24.txt'
         f = open(path2, 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
