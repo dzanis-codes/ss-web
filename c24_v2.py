@@ -83,7 +83,7 @@ def glabat_slud(link, type):
             cena_m2_c = cena_m2_tag.text
             cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
-        if citsinfo.text == None:
+        if citsinfo == None:
             apraksts = "na"  
         else:
             apraksts = citsinfo.text
