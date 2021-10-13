@@ -31,7 +31,7 @@ link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale', 'https:
 
 def glabat_slud(link, type):
     print(link)
-    driver = webdriver.Chrome('chromedriver',options=options)
+    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options = options)
     #print("..4")
  
     driver.get(link)
@@ -83,7 +83,10 @@ def glabat_slud(link, type):
             cena_m2_c = cena_m2_tag.text
             cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
-        apraksts = citsinfo.text
+        if citsinfo.text == None:
+            apraksts = "na"  
+        else:
+            apraksts = citsinfo.text
 
         check_platiba = g_data[count].find_all('ul')[0].text
         if "m" in check_platiba: 
