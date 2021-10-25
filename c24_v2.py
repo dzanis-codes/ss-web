@@ -32,26 +32,26 @@ link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale', 'https:
 def glabat_slud(link, type):
     print(link)
     driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options = options)
-    print("..4")
+    #print("..4")
  
     driver.get(link)
     time.sleep(5)
-    print("..5")
+    #print("..5")
     #a = driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]')
     #print(a)
     driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]').click()
     time.sleep(3)
-    print("..6")
+    #print("..6")
     #b = driver.find_element_by_css_selector('[class="select__value"]')
     #print(b)
     driver.find_element_by_css_selector('[class="select__value"]').click()
-    print("..7")
+    #print("..7")
     time.sleep(3)
     driver.find_element_by_css_selector('[value = "datePublished-desc"]').click()
     time.sleep(5)
-    print("..8")
+    #print("..8")
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    print("..9")
+    #print("..9")
     g_data = soup.find_all("div", {"class": "object object--list object--result"})
     
     #print(len(g_data))
@@ -83,7 +83,7 @@ def glabat_slud(link, type):
             cena_m2_c = cena_m2_tag.text
             cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
-        if citsinfo == None:
+        if citsinfo.text == None:
             apraksts = "na"  
         else:
             apraksts = citsinfo.text
@@ -130,7 +130,7 @@ def glabat_slud(link, type):
 link = 0
 while link != 4:
     try:
-        print("2")
+        #print("2")
         glabat_slud(link_list[link], link)
         link += 1
     except Exception as e:
