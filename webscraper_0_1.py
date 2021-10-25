@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import sqlite3
 
 
-path = '/LBData/RealEstate/sscom_v3.db'
+path = '/LBData/jaunakie_dati/sscom_v3.db'
 conn = sqlite3.connect(path) ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
