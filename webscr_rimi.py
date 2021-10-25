@@ -18,6 +18,18 @@ path = '/LBData/jaunakie_dati/result01rimi.db'
 conn = sqlite3.connect(path) 
 c = conn.cursor()
 
+
+# Create table
+c.execute('''CREATE TABLE IF NOT EXISTS results
+           (name_id INTEGER PRIMARY KEY, produkta_id, prod_nosaukums, prod_links, prod_nosaukums2, prod_internal_data, cena, pilna_cena, discount, cena_pirms_atl, avots, timestamp)''')
+
+
+# Save (commit) the changes
+conn.commit()
+
+
+
+
 #Šī ir galvenā funkcija, kas lieto "links" kā input, linku kurā ieiet un savākt un saglabāt datus no šī linka
 def savaksana(links):
     
