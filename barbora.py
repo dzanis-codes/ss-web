@@ -108,18 +108,27 @@ while linka_nr < len(linku_saraksts):
 
     try:
         #webdraiveris atver, uzklikšķina uz Rīgas un tad atver linku
-
+        #options = Options()
+        #options.headless = True
+        #driver = webdriver.Firefox() #options = options
         driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver", options=chrome_options)
 
         driver.get("https://www.barbora.lv")
         time.sleep(5)
         driver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[1]/div/button').click()
         time.sleep(5)
+
+
         driver.get(linku_saraksts[linka_nr])
         time.sleep(5)
+
         soup = BeautifulSoup(driver.page_source, 'html.parser')
+
         g_data = soup.find("ul", {"class": "pagination"})
+
+
         lapa = 1
+
         max_lapa = skaita_lapas(g_data)
         print(max_lapa)
 
@@ -141,6 +150,9 @@ while linka_nr < len(linku_saraksts):
         driver.quit()
         time.sleep(5)
 
+
+
+
     
     #šeit pie jebkuras kļūdas augstākesošajā 'try' sadaļā kļūda tiek ielogota ar timestamp un paņemta 10 sekunžu pauze
     #šo sadaļu var saīsināt
@@ -158,4 +170,3 @@ while linka_nr < len(linku_saraksts):
         pass     
 
 sys.exit()
-
