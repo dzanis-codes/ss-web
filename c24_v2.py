@@ -17,7 +17,7 @@ options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 
-path = '/LBData/RealEstate/result01c24.db'
+path = '/LBData/jaunakie_dati/result01c24.db'
 conn = sqlite3.connect(path) 
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS results
