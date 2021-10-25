@@ -22,7 +22,7 @@ chrome_options.add_argument("--headless")
 # chrome_options.headless = True # also works
 
 
-path = '/LBData/Retail/barbora.db'
+path = '/LBData/jaunakie_dati/barbora.db'
 
 conn = sqlite3.connect(path) 
 c = conn.cursor()
