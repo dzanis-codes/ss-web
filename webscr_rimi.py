@@ -13,7 +13,7 @@ import traceback
 
 #Tiek izveidots pieslēgums datubāzei, kur savāktie dati tiks glabāti. datubāzes izveide ir atsevišķs skripts šajā folderī
 #Var pamainīt: (1) iekļaut datubāzes veidošanu šajā skriptā (if does not exist); (2) var taisīt katru nedēļu jaunu datubāzi 
-path = '/LBData/Retail/result01rimi.db'
+path = '/LBData/jaunakie_dati/result01rimi.db'
 
 conn = sqlite3.connect(path) 
 c = conn.cursor()
