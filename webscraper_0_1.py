@@ -1,5 +1,5 @@
-## pedejas izmaiņas: 2021-02-01 Tā kā tika lietots vākšanai atjaunots
-##Pielieku klāt lai tiek gatavoti katrai nedēļai sava tabula
+# -*- coding: utf-8 -*-
+
 
 import sys
 import requests
@@ -8,13 +8,12 @@ from bs4 import BeautifulSoup
 import sqlite3
 
 
-
-conn = sqlite3.connect('sscom_v3.db') ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
+path = '/LBData/RealEstate/sscom_v3.db'
+conn = sqlite3.connect(path) ## jaapapildina datubaze ar kolonnām; nosaukt jaunu datubazes failu
 c = conn.cursor()
 
 
-## šeit tiek izveidota katru nedēļu jauna tabula, ja diena ir otrdiena
-#table_title = "results-" + time.strftime("%y", time.gmtime()) + "-" + time.strftime("%w", time.gmtime())
+
 c.execute('''CREATE TABLE IF NOT EXISTS results
            (name_id INTEGER PRIMARY KEY, ad_id, ad_text, stavs, location, premise_m2, land_m2, house_type, cena, ad_link, ad_source, estate_type, transaction_type, timestamp)''')
 conn.commit()
@@ -155,17 +154,14 @@ def ss_scraping(lpp, ipasuma_veids, darijuma_veids):
         
 
 
-#main function review
-#Veelaak apdomat vai vajadzigi divi while true 
-
 ipasuma_veids = 0
 while ipasuma_veids < 5:
     for darijuma_veids in range(2):
         for lpp in range(lpp_skaits):                      
                         try:
-                            ss_scraping(lpp, ipasuma_veids,darijuma_veids)
+                            ss_scraping(lpp, ipasuma_veids, darijuma_veids)
                         except Exception as e:
-                            logfile = "log_ss_" + table_title
+                            logfile = '/LBApp_log/sscom_errors.txt'
                             f = open(logfile, 'a+')
                             ts = time.gmtime()
                             timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
