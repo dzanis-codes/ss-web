@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 ##Papildināt ar funkciju, kas pie None type atrašanas dod False vai "na"
 
 
@@ -13,8 +13,9 @@ import traceback
 
 #Tiek izveidots pieslēgums datubāzei, kur savāktie dati tiks glabāti. datubāzes izveide ir atsevišķs skripts šajā folderī
 #Var pamainīt: (1) iekļaut datubāzes veidošanu šajā skriptā (if does not exist); (2) var taisīt katru nedēļu jaunu datubāzi 
+path = '/LBData/Retail/result01rimi.db'
 
-conn = sqlite3.connect('result01rimi.db') 
+conn = sqlite3.connect(path) 
 c = conn.cursor()
 
 #Šī ir galvenā funkcija, kas lieto "links" kā input, linku kurā ieiet un savākt un saglabāt datus no šī linka
@@ -146,7 +147,8 @@ while linka_nr < len(linku_saraksts):
     #šeit pie jebkuras kļūdas augstākesošajā 'try' sadaļā kļūda tiek ielogota ar timestamp un paņemta 10 sekunžu pauze
     #šo sadaļu var saīsināt
     except Exception as e:
-        f = open('errorlog_rimi.txt', 'a+')
+        error_path = '/LBApp_log/errorlog_rimi.txt'
+        f = open(error_path, 'a+')
         ts = time.gmtime()
         timestamp = (time.strftime("%Y-%m-%d %H:%M:%S", ts))
         f.write('\n %s \n' % e)
