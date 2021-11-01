@@ -26,7 +26,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS results
 conn.commit()
 
 
-link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale', 'https://www.city24.lv/real-estate-search/apartments-for-sale', 'https://www.city24.lv/real-estate-search/houses-for-rent', 'https://www.city24.lv/real-estate-search/apartments-for-rent')
+link_list = ('https://www.city24.lv/real-estate-search/houses-for-sale/date=today', 'https://www.city24.lv/real-estate-search/apartments-for-sale/date=today', 'https://www.city24.lv/real-estate-search/houses-for-rent/date=today', 'https://www.city24.lv/real-estate-search/apartments-for-rent/date=today')
 
 
 def glabat_slud(link, type):
@@ -34,21 +34,21 @@ def glabat_slud(link, type):
     driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options = options)
     #print("..4")
  
-    driver.get(link)
-    time.sleep(5)
+    #driver.get(link)
+    time.sleep(6)
     #print("..5")
     #a = driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]')
     #print(a)
-    driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]').click()
-    time.sleep(3)
+    #driver.find_element_by_css_selector('[id="onetrust-accept-btn-handler"]').click()
+    #time.sleep(3)
     #print("..6")
     #b = driver.find_element_by_css_selector('[class="select__value"]')
     #print(b)
-    driver.find_element_by_css_selector('[class="select__value"]').click()
+    #driver.find_element_by_css_selector('[class="select__value"]').click()
     #print("..7")
-    time.sleep(3)
-    driver.find_element_by_css_selector('[value = "datePublished-desc"]').click()
-    time.sleep(5)
+    #time.sleep(3)
+    #driver.find_element_by_css_selector('[value = "datePublished-desc"]').click()
+    #time.sleep(5)
     #print("..8")
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     #print("..9")
@@ -88,7 +88,7 @@ def glabat_slud(link, type):
             cena_m2_c = cena_m2_tag.text
             cena_m2 = unicodedata.normalize("NFKD", cena_m2_c)
         citsinfo = g_data[count].find("div", {"class": "object__slogan"})
-        if citsinfo.text == None:
+        if citsinfo == None:
             apraksts = "na"  
         else:
             apraksts = citsinfo.text
