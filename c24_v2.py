@@ -65,10 +65,15 @@ def glabat_slud(link, type):
         adrese_tag = g_data[count].find("a", {"class": "object__location"})
         #print(adrese_tag)
         print("3")
-        street = adrese_tag.find("h3", {"class": "object__address"}).text
-        region = adrese_tag.find("div", {"class": "object__area"}).text
-        #adrese = adrese_tag.text
-        adrese = str(street) + "; " + str(region)
+        if adrese_tag.find("h3", {"class": "object__address"}) == None:
+            adrese = "na"
+        elif adrese_tag.find("div", {"class": "object__area"}) == None:
+            adrese = str(street)
+        else:
+            street = adrese_tag.find("h3", {"class": "object__address"}).text
+            region = adrese_tag.find("div", {"class": "object__area"}).text
+            #adrese = adrese_tag.text
+            adrese = str(street) + "; " + str(region)
         print(adrese)
 
         cena_tag = g_data[count].find("div", {"class": "object-price__main-price"})
