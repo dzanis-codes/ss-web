@@ -72,16 +72,19 @@ driver.execute_script("arguments[0].click();", d)
 time.sleep(7)
 
 
+#soup = BeautifulSoup(driver.page_source, 'html.parser')
+#print(soup)
+
+driver.get('https://www.barbora.lv/piena-produkti-un-olas/?order=SortByPopularity&page=1')
+time.sleep(5)
+
 soup = BeautifulSoup(driver.page_source, 'html.parser')
-print(soup)
 
-b = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[1]/input')
-
-print(b)
-print(b.text)
-
-
-
+g_data = soup.find("ul", {"class": "pagination"})
+print(g_data)
+print("..............................")
+h_data = g_data.find_all("li")
+print(h_data)
 
 
 
