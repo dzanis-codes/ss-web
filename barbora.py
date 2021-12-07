@@ -9,56 +9,39 @@ from selenium.webdriver.chrome.options import Options
 import sys
 import sqlite3
 import traceback
-
-
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 chrome_options = Options()
-#chrome_options.add_argument("--disable-extensions")
 chrome_options.add_argument("--no-sandbox") # linux only
 chrome_options.add_argument("--disable-gpu")
-
 chrome_options.add_argument("--headless")
-# chrome_options.headless = True # also works
-
 
 path = '/LBData/jaunakie_dati/barbora.db'
-
 conn = sqlite3.connect(path) 
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS results
            (name_id INTEGER PRIMARY KEY, produkta_id, prod_nosaukums, prod_cena, prod_kategorija, prod_isiedati, prod_pilniedati, avots, timestamp)''')
-
-
-# Save (commit) the changes
 conn.commit()
 
 def skaita_lapas(pagination):
-
     lapu_skaits =[]
     h_data = pagination.find_all("li")
     for hh in h_data:
         k_data = hh.find("a").text
-
         try:
             m_data = int(k_data)
         except Exception as e:
             m_data = 0
-            
         lapu_skaits.append(m_data)
     return max(lapu_skaits)
-
 
 def savaksana(url):
     driver.get(url)
     time.sleep(5)
-
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-
     g_data = soup.find("ul", {"class": "pagination"})
-    max_lapa = skaita_lapas(g_data)
-    
-    
+    max_lapa = skaita_lapas(g_data)        
     item_data = soup.find_all("div", {"class": "b-product--wrap2 b-product--desktop-grid"})
     
     for item in item_data:
@@ -105,45 +88,42 @@ linka_nr = 0
 
 
 while linka_nr < len(linku_saraksts):
-
     try:
-        #webdraiveris atver, uzklikšķina uz Rīgas un tad atver linku
-        #options = Options()
-        #options.headless = True
-        #driver = webdriver.Firefox() #options = options
         driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver", options=chrome_options)
-
         driver.get("https://www.barbora.lv")
-        time.sleep(5)
-        driver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[1]/div/button').click()
-        time.sleep(5)
+        time.sleep(10)
 
+        #uzspiezh uz regiona izveeles lauka 
+        izvele = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[1]/input')
+        driver.execute_script("arguments[0].click();", izvele)
+        time.sleep(2)
+
+        #Atrod Riigas un Juurmalas regionu un uzspiezh
+        reg_izvele = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[2]/div/ul/li')
+        driver.execute_script("arguments[0].click();", reg_izvele)
+        time.sleep(2)
+
+        #Atrod pogu Turpinat un uzspiezh
+        turp_poga = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[3]/div/button')
+        driver.execute_script("arguments[0].click();", turp_poga)
+        time.sleep(7)
 
         driver.get(linku_saraksts[linka_nr])
         time.sleep(5)
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-
         g_data = soup.find("ul", {"class": "pagination"})
-
-
         lapa = 1
-
         max_lapa = skaita_lapas(g_data)
         print(max_lapa)
 
-        ##
         ##main funkcija 
-        while lapa <= max_lapa:
-           
+        while lapa <= max_lapa:           
             url_part = "page=" + str(lapa)
             full_url = linku_saraksts[linka_nr]
             new_url = full_url.replace('page=1', url_part)
             print(url_part)
-            ##main funkcija
-
             max_lapa = savaksana(new_url)
-
             lapa += 1
         
         linka_nr += 1
