@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from selenium import webdriver
+#from selenium import webdriver
 import time
 from bs4 import BeautifulSoup
 import json
 import requests
-from selenium.webdriver.chrome.options import Options
+#from selenium.webdriver.chrome.options import Options
 import sys
 import sqlite3
 import traceback
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.common.by import By
+#from selenium.webdriver.common.keys import Keys
+from requests.structures import CaseInsensitiveDict
 
-chrome_options = Options()
-chrome_options.add_argument("--no-sandbox") # linux only
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--headless")
+#chrome_options = Options()
+#chrome_options.add_argument("--no-sandbox") # linux only
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--headless")
 
 path = '/LBData/jaunakie_dati/barbora.db'
 conn = sqlite3.connect(path) 
@@ -37,9 +38,13 @@ def skaita_lapas(pagination):
     return max(lapu_skaits)
 
 def savaksana(url):
-    driver.get(url)
-    time.sleep(5)
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    #driver.get(url)
+    headers = CaseInsensitiveDict()
+    headers["Cookie"] = "region=barbora.lv"
+    response = requests.get(url, headers=headers)
+           
+    time.sleep(2)
+    soup = BeautifulSoup(response.content, 'html.parser')
     g_data = soup.find("ul", {"class": "pagination"})
     max_lapa = skaita_lapas(g_data)        
     item_data = soup.find_all("div", {"class": "b-product--wrap2 b-product--desktop-grid"})
@@ -89,29 +94,32 @@ linka_nr = 0
 
 while linka_nr < len(linku_saraksts):
     try:
-        driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver", options=chrome_options)
-        driver.get("https://www.barbora.lv")
-        time.sleep(10)
+        #driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver", options=chrome_options)
+        #driver.get("https://www.barbora.lv")
+        #time.sleep(10)
 
         #uzspiezh uz regiona izveeles lauka 
-        izvele = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[1]/input')
-        driver.execute_script("arguments[0].click();", izvele)
-        time.sleep(2)
+        #izvele = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[1]/input')
+        #driver.execute_script("arguments[0].click();", izvele)
+        #time.sleep(2)
 
         #Atrod Riigas un Juurmalas regionu un uzspiezh
-        reg_izvele = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[2]/div/ul/li')
-        driver.execute_script("arguments[0].click();", reg_izvele)
-        time.sleep(2)
+        #reg_izvele = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[1]/div/div[2]/div/div[2]/div/ul/li')
+        #driver.execute_script("arguments[0].click();", reg_izvele)
+        #time.sleep(2)
 
         #Atrod pogu Turpinat un uzspiezh
-        turp_poga = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[3]/div/button')
-        driver.execute_script("arguments[0].click();", turp_poga)
-        time.sleep(7)
+        #turp_poga = driver.find_element(By.XPATH, '//*[@id="regionApp"]/div[1]/div/div[2]/div/div/div/div[2]/div/div[3]/div/button')
+        #driver.execute_script("arguments[0].click();", turp_poga)
+        #time.sleep(7)
 
-        driver.get(linku_saraksts[linka_nr])
-        time.sleep(5)
-
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        #driver.get(linku_saraksts[linka_nr])
+        #time.sleep(5)
+        headers = CaseInsensitiveDict()
+        headers["Cookie"] = "region=barbora.lv"
+        response = requests.get(linku_saraksts[linka_nr], headers=headers)
+        time.sleep(2)
+        soup = BeautifulSoup(response.content, 'html.parser')
         g_data = soup.find("ul", {"class": "pagination"})
         lapa = 1
         max_lapa = skaita_lapas(g_data)
@@ -127,7 +135,7 @@ while linka_nr < len(linku_saraksts):
             lapa += 1
         
         linka_nr += 1
-        driver.quit()
+        #driver.quit()
         time.sleep(5)
 
 
