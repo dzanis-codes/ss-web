@@ -7,7 +7,7 @@ import traceback
 conn = sqlite3.connect('result01inch.db') 
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS results
-           (name_id INTEGER PRIMARY KEY, id, city, district, address, longitude, latitude, userUpdatedAt, dealType, rentPriceUnit, area, roomCount, floorNumber, floorTotal, price, type, stamp)''')
+           (name_id INTEGER PRIMARY KEY, id, city, district, address, longitude, latitude, userUpdatedAt, dealType, rentPriceUnit, area, roomCount, floorNumber, floorTotal, price, landArea, type, stamp)''')
 
 
 conn.commit()
@@ -42,7 +42,7 @@ link_list = ('https://api.inch.lv/api/search/apartments?city=R%C4%ABga&subdistri
 'https://api.inch.lv/api/search/apartments?city=Ventspils+un+raj.&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,roomCount,floorNumber,floorTotal&offset=0&limit=121')
 
 
-type_list = ('apartments?', 'houses?', 'lands?', 'commercials?commercialType=office&', 'commercials?commercialType=trade&', 'commercials?commercialType=industrial&')
+type_list = {'apartments?' : '&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,roomCount,floorNumber,floorTotal&offset=0&limit=121', 'houses?' : '&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,houseArea,roomCount,landArea&offset=0&limit=121', 'lands?':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area&offset=0&limit=121', 'commercials?commercialType=office&':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,floorNumber,floorTotal&offset=0&limit=121', 'commercials?commercialType=trade&':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,floorNumber,floorTotal&offset=0&limit=121', 'commercials?commercialType=industrial&':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,floorNumber,floorTotal&offset=0&limit=121'}
 
 
 def glabat_slud(ad_json, type):
@@ -56,16 +56,43 @@ def glabat_slud(ad_json, type):
   dealType = ad_json[7]
   rentPriceUnit = ad_json[8]
   area = ad_json[9]
+  #nākošajām vērtībām ir dažāda kārtība un eksistence atkarībā no type
+  if (type == 'apartments') or (type == 'houses'):
+    roomCount = ad_json[10]
+  else:
+    roomCount = 'na'    
   roomCount = ad_json[10]
-  floorNumber = ad_json[11]
-  floorTotal = ad_json[12]
-  price = ad_json[13]
-  
+  if (type == 'lands') or (type == 'houses'):
+    floorNumber = 'na'
+  elif type == 'apartments':
+    floorNumber = ad_json[11]  
+  else:
+    floorNumber = ad_json[10]   
+
+  if (type == 'lands') or (type == 'houses'):
+    floorTotal = 'na'
+  elif type == 'apartments':
+    floorTotal = ad_json[12]  
+  else:
+    floorTotal = ad_json[11]   
+
+
+
+
+  if type == 'houses':
+    price = ad_json[12]
+  else:
+    price = ad_json[10]
+
+  if type == 'houses':
+    landArea = ad_json[11]
+  else:
+    landArea = "na"
   ts = time.gmtime()
   stamp = time.strftime("%Y-%m-%d %H:%M:%S", ts)
-  sql_entry = (str(id), str(city), str(district), str(address), str(longitude), str(latitude), str(userUpdatedAt), str(dealType), str(rentPriceUnit), str(area), str(roomCount), str(floorNumber), str(floorTotal), str(price), str(type), stamp) 
+  sql_entry = (str(id), str(city), str(district), str(address), str(longitude), str(latitude), str(userUpdatedAt), str(dealType), str(rentPriceUnit), str(area), str(roomCount), str(floorNumber), str(floorTotal), str(price), str(landArea), str(type), stamp) 
   #print(sql_entry)
-  c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
+  c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
   conn.commit()
   #time.sleep(1)
 
@@ -73,18 +100,17 @@ def glabat_slud(ad_json, type):
 for category in type_list:
   print(category)
   for each_link in link_list:
-    if category == 'apartments?':
-      modified_link = each_link[:31] + category + each_link[42:]
-    elif category == 'houses?'
-      modified_link = each_link[:31] + category + each_link[42:-30] + '&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,houseArea,roomCount,landArea&offset=0&limit=121'
+    modified_link = each_link[:31] + category + each_link[42:-169] + type_list[category]
     print(modified_link)
     r = requests.get(modified_link)
     print(r.json())
+    
     section = category[:-1]
+    if section[:11] == "commercials":
+        section = "commercials"
     for ad_json in r.json()[section]['data']:
-      glabat_slud(ad_json, category)
+      glabat_slud(ad_json, section)
     time.sleep(3)
-#  dataset = (id, city, district, address, longitude, latitude, userUpdatedAt, dealType, rentPriceUnit, area, roomCount, floorNumber, floorTotal, price)
-# vajag pārbaudīt kas notiek ar tukšajiem ierakstiem
+
 
 
