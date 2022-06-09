@@ -45,7 +45,7 @@ link_list = ('https://api.inch.lv/api/search/apartments?city=R%C4%ABga&subdistri
 type_list = {'apartments?' : '&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,roomCount,floorNumber,floorTotal&offset=0&limit=121', 'houses?' : '&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,houseArea,roomCount,landArea&offset=0&limit=121', 'lands?':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area&offset=0&limit=121', 'commercials?commercialType=office&':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,floorNumber,floorTotal&offset=0&limit=121', 'commercials?commercialType=trade&':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,floorNumber,floorTotal&offset=0&limit=121', 'commercials?commercialType=industrial&':'&optimize=1&fields=id,images,city,district,address,longitude,latitude,userUpdatedAt,price,dealType,rentPriceUnit,area,floorNumber,floorTotal&offset=0&limit=121'}
 
 
-def glabat_slud(ad_json, type):
+def glabat_slud(ad_json, type, category):
   id = ad_json[0]
   city = ad_json[1]
   district = ad_json[2]
@@ -61,7 +61,7 @@ def glabat_slud(ad_json, type):
     roomCount = ad_json[10]
   else:
     roomCount = 'na'    
-  roomCount = ad_json[10]
+
   if (type == 'lands') or (type == 'houses'):
     floorNumber = 'na'
   elif type == 'apartments':
@@ -77,20 +77,24 @@ def glabat_slud(ad_json, type):
     floorTotal = ad_json[11]   
 
 
+#{'header': ['id', 'city', 'district', 'address', 'longitude', 'latitude', 'userUpdatedAt', 'dealType', 'rentPriceUnit', 'area', 'floorNumber', 'floorTotal', 'price', 'processingImages', 'images'], 'data': [[13555, 'Preiļi un raj.', None, 'Jaunsilavas 3, ', 26.166, 56.393384, '2022-05-01T16:14:37.351Z', 'sale', None, 710.9, 1, 1, 120000.0, False, {'keys': ['image0.jpg', 'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg', 'image7.jpg', 'image8.jpg', 'image9.jpg', 'image10.jpg', 'image11.jpg', 'image12.jpg', 'image13.jpg', 'image14.jpg', 'image15.jpg', 'image16.jpg', 'image17.jpg', 'image18.jpg', 'image19.jpg', 'image20.jpg'], 't': 1651453023}], [14412, 'Preiļi un raj.', None, 'Meža iela 19F, Līvāni, Līvānu pilsēta, Latvija', 26.1714054, 56.3457238, '2022-05-01T08:19:55.050Z', 'sale', None, 337.0, 1, 2, 97000.0, False, {'keys': ['image0.jpg', 'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg', 'image7.jpg', 'image8.jpg', 'image9.jpg', 'image10.jpg', 'image11.jpg', 'image12.jpg', 'image13.jpg', 'image14.jpg', 'image15.jpg', 'image16.jpg', 'image17.jpg', 'image18.jpg', 'image19.jpg', 'image20.jpg', 'image21.jpg', 'image22.jpg'], 't': 1651393195}], [17157, 'Preiļi un raj.', None, 'Baznīcas iela 29, Līvāni, Līvānu pilsēta, Latvia', 26.1641459, 56.3666848, '2022-04-20T09:45:10.568Z', 'sale', None, 3800.0, 2, 2, 350000.0, False, {'keys': ['image0.jpg', 'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg', 'image7.jpg', 'image8.jpg', 'image9.jpg', 'image10.jpg', 'image11.jpg', 'image12.jpg', 'image13.jpg', 'image14.jpg', 'image15.jpg', 'image16.jpg', 'image17.jpg', 'image18.jpg', 'image19.jpg', 'image20.jpg', 'image21.jpg', 'image22.jpg', 'image23.jpg'], 't': 1650447910}], [13255, 'Preiļi un raj.', None, 'Baznīcas iela 25, Līvāni, Līvānu pilsēta, Latvija', 26.1642779, 56.3667048, '2022-03-29T06:55:10.512Z', 'sale', None, 573.8, 2, 2, 69000.0, False, {'keys': ['image0.jpg', 'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg', 'image7.jpg', 'image8.jpg', 'image9.jpg', 'image10.jpg', 'image11.jpg', 'image12.jpg', 'image13.jpg'], 't': 1648536910}]], 'meta': {'images': {'prefix': 'https://i.inch.lv/images/commercial/', 'placeholders': {'view': 'https://i.inch.lv/images/placeholder/view_placeholder.jpg', 'preview': 'https://i.inch.lv/images/placeholder/preview_placeholder.jpg', 'full': 'https://i.inch.lv/images/placeholder/full_placeholder.jpg'}}}}}
 
-
-  if type == 'houses':
-    price = ad_json[12]
-  else:
+  if type == 'lands':
     price = ad_json[10]
+  elif type == 'apartments':
+    price = ad_json[13]
+  else:
+    price = ad_json[12]
 
   if type == 'houses':
     landArea = ad_json[11]
   else:
     landArea = "na"
+  typex = category
+
   ts = time.gmtime()
   stamp = time.strftime("%Y-%m-%d %H:%M:%S", ts)
-  sql_entry = (str(id), str(city), str(district), str(address), str(longitude), str(latitude), str(userUpdatedAt), str(dealType), str(rentPriceUnit), str(area), str(roomCount), str(floorNumber), str(floorTotal), str(price), str(landArea), str(type), stamp) 
+  sql_entry = (str(id), str(city), str(district), str(address), str(longitude), str(latitude), str(userUpdatedAt), str(dealType), str(rentPriceUnit), str(area), str(roomCount), str(floorNumber), str(floorTotal), str(price), str(landArea), str(typex), stamp) 
   #print(sql_entry)
   c.execute("INSERT INTO results VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", sql_entry)
   conn.commit()
@@ -109,7 +113,7 @@ for category in type_list:
     if section[:11] == "commercials":
         section = "commercials"
     for ad_json in r.json()[section]['data']:
-      glabat_slud(ad_json, section)
+      glabat_slud(ad_json, section, category)
     time.sleep(3)
 
 
