@@ -106,23 +106,23 @@ def glabat_slud(ad_json, type, category):
 
 type_nr = 0
 while type_nr < len(type_list):    
-    try:
-      for category in type_list:
-        print(category)
-        for each_link in link_list:
-          modified_link = each_link[:31] + category + each_link[42:-169] + type_list[category]
-          print(modified_link)
-          r = requests.get(modified_link)
-          print(r.json())    
-          section = category[:-1]
-          if section[:11] == "commercials":
-            section = "commercials"
-          for ad_json in r.json()[section]['data']:
-            glabat_slud(ad_json, section, category)
-          time.sleep(3)       
-      type_nr += 1
-
-    except Exception as e:
+  print("While " + str(type_nr) + " is less than " + str(len(type_list)))
+  for category in type_list:
+    print(category)
+    for each_link in link_list:
+      try:
+        modified_link = each_link[:31] + category + each_link[42:-169] + type_list[category]
+        print(modified_link)
+        r = requests.get(modified_link)
+        print(r.json())    
+        section = category[:-1]
+        if section[:11] == "commercials":
+          section = "commercials"
+        for ad_json in r.json()[section]['data']:
+          glabat_slud(ad_json, section, category)
+        time.sleep(3)
+        type_nr = type_nr + 1
+      except Exception as e:
         error_path = '/LBApp_log/errorlog_inch.txt'
         f = open(error_path, 'a+')
         ts = time.gmtime()
